@@ -4,10 +4,12 @@ import React, { useState } from 'react';
 import { useApp } from '@/lib/AppContext';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
 import { useToast } from '@/components/ui/Toast';
-import { X, Sparkles, Image, Check, Heart, Camera, Sliders, MapPin } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { FileUpload } from '@/components/ui/FileUpload';
+import { putBlob } from '@/lib/indexedDb';
+import { sanitize } from '@/lib/sanitize';
+import { X, Sparkles, Image, Check, Camera, Sliders } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // Mock Gallery Images with beautiful gradients representing foods
 const MOCK_GALLERY = [
@@ -35,9 +37,10 @@ export const CreatePostModal: React.FC = () => {
   const { toast } = useToast();
 
   const [step, setStep] = useState(1);
-  const [selectedMedia, setSelectedMedia] = useState<string[]>([]);
   const [selectedMockId, setSelectedMockId] = useState<string | null>(null);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [activeFilter, setActiveFilter] = useState('normal');
+  const [isUploading, setIsUploading] = useState(false);
   
   // Post Details state
   const [caption, setCaption] = useState('');
@@ -52,26 +55,34 @@ export const CreatePostModal: React.FC = () => {
   const handleClose = () => {
     setCreatePostOpen(false);
     setStep(1);
-    setSelectedMedia([]);
     setSelectedMockId(null);
+    setUploadedFile(null);
     setActiveFilter('normal');
     setCaption('');
   };
 
   const handleSelectMock = (mock: typeof MOCK_GALLERY[0]) => {
+    setUploadedFile(null);
     setSelectedMockId(mock.id);
-    // Simulate image array
-    setSelectedMedia([mock.name]);
     setIsVeg(mock.isVeg);
     setCaption(`Trying the amazing ${mock.name}! Superb flavors and outstanding presentation. #foodie #recommended`);
   };
 
+  const handleCustomFile = (file: File | null) => {
+    setSelectedMockId(null);
+    setUploadedFile(file);
+    if (file) {
+      setIsVeg(true);
+      setCaption(`Just uploaded my review of this delicious dish! #plating #instafood`);
+    }
+  };
+
   const handleNext = () => {
-    if (selectedMedia.length === 0) {
+    if (!selectedMockId && !uploadedFile) {
       toast({
         type: 'error',
         title: 'Media Required',
-        description: 'Please select a dish from the gallery to continue.'
+        description: 'Please select a mock dish or upload a photo/video from your device.'
       });
       return;
     }
@@ -82,26 +93,47 @@ export const CreatePostModal: React.FC = () => {
     setStep(prev => prev - 1);
   };
 
-  const handlePublish = () => {
+  const handlePublish = async () => {
+    setIsUploading(true);
     const restaurant = restaurants.find(r => r.id === selectedRestaurantId);
     
     // Average ratings
     const avgRating = parseFloat(((platingRating + tasteRating + ambianceRating) / 3).toFixed(1));
 
+    let photoUrl = '';
+    let mediaKey = '';
+
+    if (uploadedFile) {
+      mediaKey = `media_${Date.now()}`;
+      try {
+        await putBlob(mediaKey, uploadedFile);
+        photoUrl = `indexeddb://${mediaKey}`;
+      } catch (e) {
+        console.error('Failed to store media in IndexedDB', e);
+        toast({
+          type: 'error',
+          title: 'Upload Failed',
+          description: 'Failed to write media to local database.'
+        });
+        setIsUploading(false);
+        return;
+      }
+    }
+
     const newPost = {
       id: `p_dyn_${Date.now()}`,
-      authorType: 'customer',
+      authorType: 'customer' as const,
       authorId: user?.id || 'u1',
       authorName: user?.name || 'Riya Kapoor',
       authorAvatar: user?.avatar || 'RK',
       restaurantId: selectedRestaurantId,
       restaurantName: restaurant?.name || 'Spice Route',
       city: user?.preferences?.city || 'Mumbai',
-      photoUrl: '', // simulated
-      isMockGradient: true,
-      mockGradientStyle: MOCK_GALLERY.find(g => g.id === selectedMockId)?.style || 'from-primary to-amber-accent',
+      photoUrl: photoUrl,
+      isMockGradient: !uploadedFile,
+      mockGradientStyle: selectedMockId ? MOCK_GALLERY.find(g => g.id === selectedMockId)?.style || 'from-primary to-amber-accent' : 'from-primary to-amber-accent',
       filterClass: FILTER_PRESETS.find(f => f.id === activeFilter)?.filterClass || '',
-      caption: caption,
+      caption: sanitize(caption),
       isVeg: isVeg,
       rating: avgRating,
       likesCount: 1,
@@ -112,8 +144,9 @@ export const CreatePostModal: React.FC = () => {
         taste: tasteRating,
         ambiance: ambianceRating
       },
-      galleryNames: selectedMedia,
-      commentsList: []
+      galleryNames: uploadedFile ? [uploadedFile.name] : (selectedMockId ? [MOCK_GALLERY.find(g => g.id === selectedMockId)!.name] : []),
+      commentsList: [],
+      mediaType: uploadedFile?.type.startsWith('video/') ? 'video' : 'image'
     };
 
     addPost(newPost);
@@ -122,6 +155,7 @@ export const CreatePostModal: React.FC = () => {
       title: 'Post Published Successfully!',
       description: 'Your dish plating photo is now live on the community feed.'
     });
+    setIsUploading(false);
     handleClose();
   };
 
@@ -132,7 +166,7 @@ export const CreatePostModal: React.FC = () => {
         initial={{ scale: 0.95, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-bg-card border border-line rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col h-[560px] max-h-[90vh]"
+        className="bg-bg-card border border-line rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden flex flex-col h-[600px] max-h-[90vh]"
       >
         {/* Modal Header */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-line">
@@ -148,9 +182,15 @@ export const CreatePostModal: React.FC = () => {
             {step < 3 ? (
               <Button size="sm" onClick={handleNext} className="text-xs">Next</Button>
             ) : (
-              <Button size="sm" variant="primary" onClick={handlePublish} className="text-xs flex gap-1 items-center">
+              <Button 
+                size="sm" 
+                variant="primary" 
+                onClick={handlePublish} 
+                disabled={isUploading} 
+                className="text-xs flex gap-1 items-center"
+              >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Share</span>
+                <span>{isUploading ? 'Sharing...' : 'Share'}</span>
               </Button>
             )}
           </div>
@@ -160,44 +200,51 @@ export const CreatePostModal: React.FC = () => {
         <div className="flex-1 overflow-y-auto p-5 space-y-4">
           {/* Step 1: Select Food Image */}
           {step === 1 && (
-            <div className="space-y-4 h-full flex flex-col justify-between">
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-ink-soft uppercase tracking-wider">Select Food from Device Gallery</label>
-                <div className="grid grid-cols-3 gap-3">
-                  {MOCK_GALLERY.map(mock => {
-                    const isSelected = selectedMockId === mock.id;
-                    return (
-                      <div
-                        key={mock.id}
-                        onClick={() => handleSelectMock(mock)}
-                        className={`aspect-square rounded-xl bg-gradient-to-tr ${mock.style} relative cursor-pointer border-2 transition-all hover:scale-102 flex flex-col justify-end p-2 text-white ${
-                          isSelected ? 'border-primary ring-2 ring-primary-soft' : 'border-transparent'
-                        }`}
-                      >
-                        {isSelected && (
-                          <div className="absolute top-1.5 right-1.5 bg-primary rounded-full p-0.5 z-10">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        )}
-                        <span className="text-[9px] font-semibold bg-black/40 px-1 py-0.5 rounded backdrop-blur-xs truncate w-full">
-                          {mock.name}
-                        </span>
-                      </div>
-                    );
-                  })}
+            <div className="space-y-4 flex flex-col justify-between min-h-full">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-bold text-ink-soft uppercase tracking-wider">Select Preset Dish</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {MOCK_GALLERY.map(mock => {
+                      const isSelected = selectedMockId === mock.id;
+                      return (
+                        <div
+                          key={mock.id}
+                          onClick={() => handleSelectMock(mock)}
+                          className={`aspect-square rounded-xl bg-gradient-to-tr ${mock.style} relative cursor-pointer border-2 transition-all hover:scale-102 flex flex-col justify-end p-2 text-white ${
+                            isSelected ? 'border-primary ring-2 ring-primary-soft' : 'border-transparent'
+                          }`}
+                        >
+                          {isSelected && (
+                            <div className="absolute top-1.5 right-1.5 bg-primary rounded-full p-0.5 z-10">
+                              <Check className="w-3 h-3 text-white" />
+                            </div>
+                          )}
+                          <span className="text-[9px] font-semibold bg-black/40 px-1 py-0.5 rounded backdrop-blur-xs truncate w-full">
+                            {mock.name}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
+
+                <div className="relative flex py-2 items-center">
+                  <div className="flex-grow border-t border-line"></div>
+                  <span className="flex-shrink mx-4 text-[9px] font-bold text-ink-soft uppercase tracking-wider">Or upload custom media</span>
+                  <div className="flex-grow border-t border-line"></div>
+                </div>
+
+                <FileUpload 
+                  onChange={handleCustomFile}
+                  aspectRatio="1:1"
+                  label="Upload Plating Photo/Video"
+                />
               </div>
 
-              {/* Upload alternative */}
-              <div className="border border-dashed border-line rounded-xl p-8 text-center bg-bg/20 hover:bg-bg/40 transition-all cursor-pointer">
-                <Camera className="w-8 h-8 text-ink-soft mx-auto mb-2" />
-                <span className="text-xs font-semibold text-ink">Upload your own plating photo</span>
-                <p className="text-[10px] text-ink-soft mt-1">Supports JPEG, PNG up to 10MB</p>
-              </div>
-
-              {selectedMedia.length > 0 && (
+              {(selectedMockId || uploadedFile) && (
                 <div className="bg-success-bg/30 border border-success/15 rounded-lg p-3 text-success text-xs font-medium flex items-center justify-between">
-                  <span>Selected: {selectedMedia[0]}</span>
+                  <span>Selected: {uploadedFile ? uploadedFile.name : MOCK_GALLERY.find(g => g.id === selectedMockId)?.name}</span>
                   <span className="text-[10px] uppercase font-bold tracking-wide">Ready</span>
                 </div>
               )}
@@ -206,7 +253,7 @@ export const CreatePostModal: React.FC = () => {
 
           {/* Step 2: Filters */}
           {step === 2 && (
-            <div className="space-y-6 flex flex-col justify-between h-full">
+            <div className="space-y-6 flex flex-col justify-between min-h-full">
               {/* Filtered Preview Box */}
               <div className="flex-1 max-h-56 aspect-video bg-bg-alt/25 rounded-xl border border-line flex items-center justify-center relative overflow-hidden">
                 {selectedMockId ? (
@@ -215,6 +262,22 @@ export const CreatePostModal: React.FC = () => {
                   } ${
                     FILTER_PRESETS.find(f => f.id === activeFilter)?.filterClass
                   }`} />
+                ) : uploadedFile ? (
+                  uploadedFile.type.startsWith('video/') ? (
+                    <video
+                      src={URL.createObjectURL(uploadedFile)}
+                      className={`w-full h-full object-cover ${FILTER_PRESETS.find(f => f.id === activeFilter)?.filterClass}`}
+                      controls
+                      playsInline
+                    />
+                  ) : (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={URL.createObjectURL(uploadedFile)}
+                      alt="Uploaded plating"
+                      className={`w-full h-full object-cover ${FILTER_PRESETS.find(f => f.id === activeFilter)?.filterClass}`}
+                    />
+                  )
                 ) : (
                   <Image className="w-12 h-12 text-ink-soft" />
                 )}
@@ -223,7 +286,7 @@ export const CreatePostModal: React.FC = () => {
                 </span>
               </div>
 
-              {/* Filter Options slider list */}
+              {/* Filter Options */}
               <div className="space-y-2">
                 <label className="text-[10px] font-bold text-ink-soft uppercase tracking-wider">Select Style Filter</label>
                 <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-none">
@@ -254,7 +317,6 @@ export const CreatePostModal: React.FC = () => {
           {/* Step 3: Metadata detail inputs */}
           {step === 3 && (
             <div className="space-y-4">
-              {/* Caption */}
               <div className="flex flex-col gap-1.5">
                 <label className="text-[10px] font-bold text-ink-soft uppercase tracking-wider">Write Caption / Hashtags</label>
                 <textarea
@@ -266,7 +328,6 @@ export const CreatePostModal: React.FC = () => {
                 />
               </div>
 
-              {/* Location selection */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex flex-col gap-1.5">
                   <label className="text-[10px] font-bold text-ink-soft uppercase tracking-wider">Tag Restaurant</label>
@@ -313,7 +374,6 @@ export const CreatePostModal: React.FC = () => {
                 </span>
 
                 <div className="space-y-1.5 text-xs">
-                  {/* Plating presentation */}
                   <div className="flex justify-between items-center gap-4">
                     <span className="font-medium text-ink-soft w-28">Plating Design</span>
                     <input
@@ -328,7 +388,6 @@ export const CreatePostModal: React.FC = () => {
                     <span className="font-bold text-primary w-10 text-right">{platingRating} ★</span>
                   </div>
 
-                  {/* Food taste */}
                   <div className="flex justify-between items-center gap-4">
                     <span className="font-medium text-ink-soft w-28">Food Taste</span>
                     <input
@@ -343,7 +402,6 @@ export const CreatePostModal: React.FC = () => {
                     <span className="font-bold text-primary w-10 text-right">{tasteRating} ★</span>
                   </div>
 
-                  {/* Ambiance */}
                   <div className="flex justify-between items-center gap-4">
                     <span className="font-medium text-ink-soft w-28">Restaurant Decor</span>
                     <input
@@ -362,9 +420,15 @@ export const CreatePostModal: React.FC = () => {
 
               <div className="flex justify-between items-center gap-4 pt-2">
                 <Button variant="outline" size="sm" onClick={handleBack} className="w-24 text-xs">Back</Button>
-                <Button variant="primary" size="sm" onClick={handlePublish} className="flex-1 text-xs py-2.5 flex items-center justify-center gap-1.5">
+                <Button 
+                  variant="primary" 
+                  size="sm" 
+                  onClick={handlePublish} 
+                  disabled={isUploading}
+                  className="flex-1 text-xs py-2.5 flex items-center justify-center gap-1.5"
+                >
                   <Sparkles className="w-4 h-4" />
-                  <span>Publish Post</span>
+                  <span>{isUploading ? 'Publishing...' : 'Publish Post'}</span>
                 </Button>
               </div>
             </div>

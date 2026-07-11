@@ -48,10 +48,10 @@ export default function ManagerOrdersPage() {
     const newOrder = {
       id: newOrderId,
       restaurantId: user?.restaurantId || 'r1',
-      type: 'online',
+      type: 'online' as const,
       items: [{ menuItemId: 'm1', quantity: 2, name: 'Volcano paneer tikka', price: 270 }],
       total: 540,
-      status: 'pending',
+      status: 'pending' as const,
       createdAt: new Date().toISOString(),
       customerName: 'Rohit Sharma',
       customerPhone: '+91-9877766655',

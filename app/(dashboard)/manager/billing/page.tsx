@@ -22,7 +22,7 @@ export default function ManagerBillingPage() {
     // Search query matches bill id or table number or customer name
     const matchesSearch = 
       bill.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      bill.tableNumber.toString().includes(searchQuery) ||
+      (bill.tableNumber !== undefined && bill.tableNumber.toString().includes(searchQuery)) ||
       bill.customerName.toLowerCase().includes(searchQuery.toLowerCase());
 
     // Payment mode matches

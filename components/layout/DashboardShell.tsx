@@ -10,6 +10,8 @@ import { Button } from '../ui/Button';
 import { X, Sparkles, LogOut } from 'lucide-react';
 import Link from 'next/link';
 
+import { navigationConfig } from '@/lib/navigation';
+
 export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
@@ -19,25 +21,7 @@ export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ childr
   const isSuperAdmin = user.role === 'superadmin';
   const isDesktopConsole = user.role === 'owner' || user.role === 'manager' || isSuperAdmin;
   const isOwner = user.role === 'owner';
-
-  const menuItems = isSuperAdmin
-    ? [
-        { name: 'SaaS Overview', href: '/superadmin' },
-        { name: 'Manage Tenants', href: '/superadmin/tenants' },
-        { name: 'Pricing Config', href: '/superadmin/config' },
-        { name: 'Account', href: '/superadmin/account' }
-      ]
-    : [
-        { name: 'Home', href: '/manager', ownerOnly: true },
-        { name: 'Table Management', href: '/manager/tables' },
-        { name: 'Online Orders', href: '/manager/orders' },
-        { name: 'Billing History', href: '/manager/billing' },
-        { name: 'User Management', href: '/manager/users', ownerOnly: true },
-        { name: 'Add Expenses', href: '/manager/expenses', ownerOnly: true },
-        { name: 'Load Menu', href: '/manager/menu' },
-        { name: 'Manage Social', href: '/manager/social' },
-        { name: 'Account', href: '/manager/account' }
-      ];
+  const menuItems = navigationConfig[user.role] || [];
 
   return (
     <div className="flex min-h-screen bg-bg">

@@ -94,7 +94,7 @@ export default function CustomerBookingsPage() {
       timeSlot: selectedTime,
       partySize,
       specialRequest: 'Dine-in booking via interactive seat map',
-      status: 'confirmed', // auto confirmed for demonstration
+      status: 'confirmed' as const, // auto confirmed for demonstration
       advancePaid: 100,
       tableNumber: tableObj?.number || 1,
       createdAt: new Date().toISOString()

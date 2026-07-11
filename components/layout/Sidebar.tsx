@@ -18,6 +18,8 @@ import {
   Sparkles
 } from 'lucide-react';
 
+import { navigationConfig } from '@/lib/navigation';
+
 export const Sidebar: React.FC = () => {
   const pathname = usePathname();
   const { user, logout } = useAuth();
@@ -26,27 +28,8 @@ export const Sidebar: React.FC = () => {
     return null;
   }
 
-  const isSuperAdmin = user.role === 'superadmin';
   const isOwner = user.role === 'owner';
-
-  const menuItems = isSuperAdmin
-    ? [
-        { name: 'SaaS Overview', href: '/superadmin', icon: Home },
-        { name: 'Manage Tenants', href: '/superadmin/tenants', icon: Users },
-        { name: 'Pricing Config', href: '/superadmin/config', icon: Wallet },
-        { name: 'Account', href: '/superadmin/account', icon: User }
-      ]
-    : [
-        { name: 'Home', href: '/manager', icon: Home, ownerOnly: true },
-        { name: 'Table Management', href: '/manager/tables', icon: Grid },
-        { name: 'Online Orders', href: '/manager/orders', icon: ShoppingCart },
-        { name: 'Billing History', href: '/manager/billing', icon: Receipt },
-        { name: 'User Management', href: '/manager/users', icon: Users, ownerOnly: true },
-        { name: 'Add Expenses', href: '/manager/expenses', icon: Wallet, ownerOnly: true },
-        { name: 'Load Menu', href: '/manager/menu', icon: ChefHat },
-        { name: 'Manage Social', href: '/manager/social', icon: Share2 },
-        { name: 'Account', href: '/manager/account', icon: User }
-      ];
+  const menuItems = navigationConfig[user.role] || [];
 
   return (
     <aside className="w-64 bg-bg-card border-r border-line h-screen sticky top-0 flex flex-col justify-between hidden lg:flex flex-shrink-0">

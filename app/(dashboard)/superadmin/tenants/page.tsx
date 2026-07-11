@@ -66,8 +66,9 @@ export default function SuperadminTenantsPage() {
       email: tenantEmail || `contact@${tenantName.toLowerCase().replace(/\s+/g, '')}.com`,
       features: ['Veg', 'Dine-in'],
       coverImage: '/images/placeholder.jpg',
-      subscriptionPlan: tenantPlan,
-      subscriptionStatus: 'Active'
+      subscriptionPlan: tenantPlan as 'Basic' | 'Premium' | 'Enterprise',
+      subscriptionStatus: 'Active' as const,
+      address: `Central Boulevard, ${tenantCity}`
     };
 
     addTenantRestaurant(newTenant);
@@ -85,7 +86,7 @@ export default function SuperadminTenantsPage() {
     });
   };
 
-  const handlePlanChange = (restaurantId: string, name: string, plan: string) => {
+  const handlePlanChange = (restaurantId: string, name: string, plan: 'Basic' | 'Premium' | 'Enterprise') => {
     updateTenantSubscription(restaurantId, plan);
     toast({
       type: 'success',
@@ -170,7 +171,7 @@ export default function SuperadminTenantsPage() {
                       <span className="font-semibold text-ink-soft">Billing Package</span>
                       <select
                         value={r.subscriptionPlan || 'Basic'}
-                        onChange={e => handlePlanChange(r.id, r.name, e.target.value)}
+                        onChange={e => handlePlanChange(r.id, r.name, e.target.value as any)}
                         className="text-[11px] border border-line rounded px-2 py-1 bg-bg-card font-semibold text-ink"
                       >
                         <option value="Basic">Basic Plan</option>

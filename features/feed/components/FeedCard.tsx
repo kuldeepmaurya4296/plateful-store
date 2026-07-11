@@ -7,24 +7,10 @@ import { useApp } from '@/lib/AppContext';
 import { Heart, MessageSquare, MapPin, Star, User } from 'lucide-react';
 import Link from 'next/link';
 
+import { Post } from '@/lib/types';
+
 interface FeedCardProps {
-  post: {
-    id: string;
-    authorType: 'restaurant' | 'customer';
-    authorId: string;
-    authorName: string;
-    authorAvatar: string;
-    city: string;
-    photoUrl: string;
-    caption: string;
-    isVeg: boolean;
-    rating: number;
-    likesCount: number;
-    commentsCount: number;
-    restaurantId?: string;
-    restaurantName?: string;
-    createdAt: string;
-  };
+  post: Post;
 }
 
 export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
@@ -46,7 +32,35 @@ export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
   
   // Custom media mockups
   const postMedia = (post as any).galleryNames || [post.caption.split('#')[0]];
-  const isVideo = post.authorType === 'restaurant' && post.id === 'p1'; // mock post p1 as video
+  const isVideo = (post as any).mediaType === 'video' || (post.authorType === 'restaurant' && post.id === 'p1'); // mock or real video
+  const [mediaUrl, setMediaUrl] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    let active = true;
+    let objectUrlToCleanup: string | null = null;
+
+    if (post.photoUrl && post.photoUrl.startsWith('indexeddb://')) {
+      const key = post.photoUrl.replace('indexeddb://', '');
+      import('@/lib/indexedDb').then(({ getBlob }) => {
+        getBlob(key).then(blob => {
+          if (blob && active) {
+            const url = URL.createObjectURL(blob);
+            objectUrlToCleanup = url;
+            setMediaUrl(url);
+          }
+        });
+      });
+    } else {
+      setMediaUrl(post.photoUrl || null);
+    }
+
+    return () => {
+      active = false;
+      if (objectUrlToCleanup) {
+        URL.revokeObjectURL(objectUrlToCleanup);
+      }
+    };
+  }, [post.photoUrl]);
 
   return (
     <Card hoverEffect className="w-full flex flex-col gap-4 overflow-hidden !p-0">
@@ -93,7 +107,39 @@ export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
         className="bg-bg-alt/20 aspect-video w-full border-y border-line flex flex-col justify-center items-center relative overflow-hidden cursor-pointer group"
       >
         {/* Render media content */}
-        {(post as any).isMockGradient ? (
+        {mediaUrl ? (
+          <div className="w-full h-full relative">
+            <Badge variant={post.isVeg ? 'success' : 'danger'} size="sm" className="absolute top-4 left-4 shadow-sm z-10">
+              {post.isVeg ? 'Veg' : 'Non-Veg'}
+            </Badge>
+            {isVideo ? (
+              <video
+                src={mediaUrl}
+                className={`w-full h-full object-cover ${(post as any).filterClass}`}
+                autoPlay={isPlaying}
+                loop
+                muted={isMuted}
+                playsInline
+              />
+            ) : (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={mediaUrl}
+                alt="Plating"
+                className={`w-full h-full object-cover ${(post as any).filterClass}`}
+              />
+            )}
+            
+            {/* Video Overlay Play/Pause indicator */}
+            {isVideo && !isPlaying && (
+              <div className="absolute inset-0 bg-black/10 flex items-center justify-center pointer-events-none">
+                <div className="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white">
+                  <span>▶</span>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (post as any).isMockGradient ? (
           <div className={`w-full h-full bg-gradient-to-tr ${(post as any).mockGradientStyle} ${(post as any).filterClass} flex flex-col justify-center items-center text-center p-8 text-white relative`}>
             <Badge variant={post.isVeg ? 'success' : 'danger'} size="sm" className="absolute top-4 left-4 shadow-sm">
               {post.isVeg ? 'Veg' : 'Non-Veg'}

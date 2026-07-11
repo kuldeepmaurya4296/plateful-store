@@ -48,7 +48,7 @@ export default function CustomerSearchPage() {
                          (post.restaurantName && post.restaurantName.toLowerCase().includes(searchQuery.toLowerCase()));
     
     const matchesDiet = dietFilter === 'veg' ? post.isVeg : (dietFilter === 'non-veg' ? !post.isVeg : true);
-    const matchesRating = ratingFilter ? post.rating >= ratingFilter : true;
+    const matchesRating = ratingFilter ? (post.rating !== undefined && post.rating >= ratingFilter) : true;
 
     return matchesQuery && matchesDiet && matchesRating;
   });
@@ -205,7 +205,7 @@ export default function CustomerSearchPage() {
               <Card key={post.id} className="!p-3.5 flex items-center gap-4 hover:border-primary/20 cursor-pointer">
                 {/* Visual Thumbnail */}
                 <div className={`w-14 h-14 rounded-lg bg-gradient-to-tr ${
-                  post.isMockGradient ? post.mockGradientStyle : 'from-primary to-amber-accent'
+                  (post as any).isMockGradient ? (post as any).mockGradientStyle : 'from-primary to-amber-accent'
                 } flex items-center justify-center text-white font-serif font-bold text-xs flex-shrink-0 border border-line/45`}>
                   <span>{post.authorAvatar}</span>
                 </div>

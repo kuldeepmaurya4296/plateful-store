@@ -11,6 +11,9 @@ import { useToast } from '@/components/ui/Toast';
 import { ArrowLeft, CreditCard, DollarSign, Camera, CheckCircle } from 'lucide-react';
 import Link from 'next/link';
 
+import { useScopedAccess } from '@/lib/hooks/useScopedAccess';
+import { useEffect } from 'react';
+
 export default function CaptainSettlementPage() {
   const params = useParams();
   const router = useRouter();
@@ -19,16 +22,28 @@ export default function CaptainSettlementPage() {
   const { user } = useAuth();
   const { tables, settleTableBill } = useApp();
   const { toast } = useToast();
+  const { checkTableAccess } = useScopedAccess();
 
-  const table = tables.find(t => t.id === tableId);
+  const { isAuthorized, table } = checkTableAccess(tableId);
   const [paymentMode, setPaymentMode] = useState<'Cash' | 'Online'>('Online');
   const [screenshotAttached, setScreenshotAttached] = useState(false);
   const [isSettling, setIsSettling] = useState(false);
 
-  if (!table || !table.activeSession) {
+  useEffect(() => {
+    if (table && !isAuthorized) {
+      toast({
+        type: 'error',
+        title: 'Access Denied',
+        description: 'You are not authorized to view or manage this table.'
+      });
+      router.replace('/captain');
+    }
+  }, [isAuthorized, table, router, toast]);
+
+  if (!table || !isAuthorized || !table.activeSession) {
     return (
       <div className="max-w-xl mx-auto px-4 py-8 text-center">
-        <h3 className="text-sm font-serif font-bold text-ink">No Active Order for Settlement</h3>
+        <h3 className="text-sm font-serif font-bold text-ink">Access Denied / No Active Order for Settlement</h3>
         <Link href="/captain">
           <Button variant="primary" className="mt-4">Back to Grid</Button>
         </Link>

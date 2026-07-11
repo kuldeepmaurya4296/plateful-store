@@ -1,0 +1,12 @@
+[
+  {
+    "id": "n1",
+    "userId": "u1",
+    "type": "booking_confirmed",
+    "title": "Booking Confirmed",
+    "message": "Spice Route confirmed your 7:30 PM reservation for 2",
+    "isRead": false,
+    "createdAt": "2026-07-11T12:05:00+05:30",
+    "link": "/customer/bookings"
+  }
+]

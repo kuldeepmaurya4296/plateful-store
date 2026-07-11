@@ -1,24 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { User } from '@/lib/types';
 import usersData from '@/data/users.json';
-
-export interface User {
-  id: string;
-  name: string;
-  email?: string;
-  phone?: string;
-  role: 'customer' | 'owner' | 'manager' | 'captain' | 'superadmin';
-  avatar: string;
-  username: string;
-  restaurantId?: string;
-  counterId?: string;
-  assignedTables?: string[];
-  preferences?: {
-    dietFilter: 'veg' | 'non-veg' | 'both';
-    city: string;
-  };
-}
 
 interface AuthContextType {
   user: User | null;
@@ -58,21 +42,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return true;
     }
 
-    // Fallback: create dynamic user for testing if username is not in mock data
-    const fallbackUser: User = {
-      id: `u_dyn_${Date.now()}`,
-      name: username.split('.')[0].replace(/^\w/, c => c.toUpperCase()) || 'Test User',
-      username: username,
-      role: role as any,
-      avatar: username.substring(0, 2).toUpperCase() || 'TU',
-      restaurantId: 'r1', // Default to Spice Route
-      counterId: role === 'captain' ? 'c1' : undefined,
-      assignedTables: role === 'captain' ? ['t1', 't2', 't3', 't4', 't5', 't6', 't7', 't8'] : undefined
-    };
-
-    setUser(fallbackUser);
-    localStorage.setItem('plateful_user', JSON.stringify(fallbackUser));
-    return true;
+    return false;
   };
 
   const logout = () => {

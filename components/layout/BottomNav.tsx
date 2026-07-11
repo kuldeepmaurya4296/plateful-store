@@ -7,6 +7,8 @@ import { useAuth } from '@/features/auth/context/AuthContext';
 import { useApp } from '@/lib/AppContext';
 import { Home, Search, User, Grid, LogOut, PlusSquare, Film } from 'lucide-react';
 
+import { navigationConfig } from '@/lib/navigation';
+
 export const BottomNav: React.FC = () => {
   const pathname = usePathname();
   const { user } = useAuth();
@@ -19,22 +21,7 @@ export const BottomNav: React.FC = () => {
     return null; 
   }
 
-  const isCustomer = user.role === 'customer';
-
-  const customerItems = [
-    { name: 'Feed', href: '/customer', icon: Home },
-    { name: 'Search', href: '/customer/search', icon: Search },
-    { name: 'Create', href: '#create', icon: PlusSquare, isModal: true },
-    { name: 'Reels', href: '/customer/reels', icon: Film },
-    { name: 'Account', href: '/customer/account', icon: User }
-  ];
-
-  const captainItems = [
-    { name: 'Tables', href: '/captain', icon: Grid },
-    { name: 'Account', href: '/captain/account', icon: User }
-  ];
-
-  const items = isCustomer ? customerItems : captainItems;
+  const items = navigationConfig[user.role] || [];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-bg-card border-t border-line lg:hidden flex justify-around items-center h-16 safe-bottom">

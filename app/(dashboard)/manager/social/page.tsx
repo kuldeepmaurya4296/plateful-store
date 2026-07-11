@@ -24,6 +24,8 @@ import {
   Tv,
   Check
 } from 'lucide-react';
+import { FileUpload } from '@/components/ui/FileUpload';
+import { putBlob } from '@/lib/indexedDb';
 
 export default function ManagerSocialPage() {
   const { user } = useAuth();
@@ -37,6 +39,8 @@ export default function ManagerSocialPage() {
   const [showStoryModal, setShowStoryModal] = useState(false);
   const [storyTitle, setStoryTitle] = useState('');
   const [storyIsPermanent, setStoryIsPermanent] = useState(false);
+  const [storyFile, setStoryFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   // Discount campaign state
   const [discountPercent, setDiscountPercent] = useState('15');
@@ -55,7 +59,7 @@ export default function ManagerSocialPage() {
   const tenantTables = tables.filter(t => t.restaurantId === user?.restaurantId);
   const selectedSpecial = items.find(i => i.id === specialItemId) || items[0];
 
-  const handlePostStory = (e: React.FormEvent) => {
+  const handlePostStory = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!storyTitle.trim()) {
       toast({
@@ -66,10 +70,38 @@ export default function ManagerSocialPage() {
       return;
     }
 
+    if (!storyFile) {
+      toast({
+        type: 'error',
+        title: 'Media Required',
+        description: 'Please select a story image or video file to publish.'
+      });
+      return;
+    }
+
+    setIsUploading(true);
+    const mediaKey = `story_${Date.now()}`;
+    let mediaUrl = '/images/story-tikka.jpg'; // default fallback
+
+    try {
+      await putBlob(mediaKey, storyFile);
+      mediaUrl = `indexeddb://${mediaKey}`;
+    } catch (e) {
+      console.error('Failed to store story media', e);
+      toast({
+        type: 'error',
+        title: 'Upload Failed',
+        description: 'Could not save story media locally.'
+      });
+      setIsUploading(false);
+      return;
+    }
+
     const newStory = {
       id: `s_dyn_${Date.now()}`,
       restaurantId: user?.restaurantId || 'r1',
-      title: storyTitle,
+      mediaUrl: mediaUrl,
+      caption: storyTitle, // stories data uses caption for title
       isPermanent: storyIsPermanent,
       views: 0,
       createdAt: new Date().toISOString(),
@@ -79,6 +111,8 @@ export default function ManagerSocialPage() {
     addStory(newStory);
     setShowStoryModal(false);
     setStoryTitle('');
+    setStoryFile(null);
+    setIsUploading(false);
     toast({
       type: 'success',
       title: 'Story Published',
@@ -202,7 +236,7 @@ export default function ManagerSocialPage() {
               {currentStories.map(story => (
                 <div key={story.id} className="flex justify-between items-center p-3 bg-bg border border-line rounded-lg">
                   <div className="space-y-1">
-                    <h4 className="text-xs font-bold text-ink">{story.title}</h4>
+                    <h4 className="text-xs font-bold text-ink">{story.caption || story.title}</h4>
                     <div className="flex items-center gap-2 text-[9px] text-ink-soft font-medium">
                       <span>{story.views} views</span>
                       <span>·</span>
@@ -214,7 +248,7 @@ export default function ManagerSocialPage() {
                   </div>
 
                   <button
-                    onClick={() => handleToggleStoryMode(story.id, story.title, story.isPermanent)}
+                    onClick={() => handleToggleStoryMode(story.id, story.caption || story.title || '', story.isPermanent)}
                     className={`px-3 py-1.5 rounded-md text-[10px] font-bold border transition-all cursor-pointer ${
                       story.isPermanent 
                         ? 'bg-secondary text-bg border-secondary' 
@@ -364,9 +398,15 @@ export default function ManagerSocialPage() {
             placeholder="e.g. Try our sizzling Galouti Dream!"
           />
 
+          <FileUpload 
+            onChange={setStoryFile}
+            aspectRatio="9:16"
+            label="Story Photo or Video (9:16)"
+          />
+
           <div className="flex flex-col gap-1.5">
             <label className="text-[10px] font-bold text-ink-soft uppercase tracking-wider">Expiration Settings</label>
-            <div className="flex gap-4 pt-1">
+            <div className="flex flex-col sm:flex-row gap-4 pt-1">
               <label className="flex items-center gap-2 text-xs text-ink cursor-pointer font-medium">
                 <input 
                   type="radio" 
@@ -391,9 +431,15 @@ export default function ManagerSocialPage() {
             </div>
           </div>
 
-          <Button type="submit" variant="primary" fullWidth className="py-2.5 flex items-center justify-center gap-1.5">
+          <Button 
+            type="submit" 
+            variant="primary" 
+            fullWidth 
+            disabled={isUploading}
+            className="py-2.5 flex items-center justify-center gap-1.5"
+          >
             <Share2 className="w-4 h-4" />
-            <span>Publish Story</span>
+            <span>{isUploading ? 'Publishing...' : 'Publish Story'}</span>
           </Button>
         </form>
       </Modal>

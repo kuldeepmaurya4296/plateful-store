@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '@/lib/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Play, Volume2, ArrowLeft, ArrowRight, Heart, Utensils } from 'lucide-react';
@@ -23,6 +23,39 @@ export const StoryTray: React.FC = () => {
 
   const activeStories = activeStoryRestaurant ? restaurantStories[activeStoryRestaurant] : [];
   const currentStory = activeStories ? activeStories[activeStoryIndex] : null;
+
+  const [resolvedMediaUrl, setResolvedMediaUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    let active = true;
+    let objectUrlToCleanup: string | null = null;
+
+    if (currentStory) {
+      if (currentStory.mediaUrl && currentStory.mediaUrl.startsWith('indexeddb://')) {
+        const key = currentStory.mediaUrl.replace('indexeddb://', '');
+        import('@/lib/indexedDb').then(({ getBlob }) => {
+          getBlob(key).then(blob => {
+            if (blob && active) {
+              const url = URL.createObjectURL(blob);
+              objectUrlToCleanup = url;
+              setResolvedMediaUrl(url);
+            }
+          });
+        });
+      } else {
+        setResolvedMediaUrl(currentStory.mediaUrl || null);
+      }
+    } else {
+      setResolvedMediaUrl(null);
+    }
+
+    return () => {
+      active = false;
+      if (objectUrlToCleanup) {
+        URL.revokeObjectURL(objectUrlToCleanup);
+      }
+    };
+  }, [currentStory]);
 
   const handleRestaurantClick = (restaurantId: string) => {
     setActiveStoryRestaurant(restaurantId);
@@ -128,22 +161,53 @@ export const StoryTray: React.FC = () => {
                 </button>
               </div>
 
-              {/* Story Content Image Placeholder */}
-              <div className="flex-1 bg-ink flex items-center justify-center relative p-8">
-                {/* Simulated photo layout */}
-                <div className="w-full h-full rounded-lg border border-white/10 bg-bg-alt/10 flex flex-col justify-between items-center py-20 px-6 text-center">
-                  <div className="w-20 h-20 rounded-full bg-primary/20 text-primary flex items-center justify-center">
-                    <Utensils className="w-10 h-10" />
+              {/* Story Content Image/Video */}
+              <div className="flex-1 bg-black flex items-center justify-center relative overflow-hidden">
+                {resolvedMediaUrl ? (
+                  <>
+                    {currentStory.mediaUrl.includes('mp4') || currentStory.mediaUrl.includes('video') ? (
+                      <video
+                        src={resolvedMediaUrl}
+                        className="w-full h-full object-cover"
+                        autoPlay
+                        playsInline
+                        loop
+                        muted
+                      />
+                    ) : (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={resolvedMediaUrl}
+                        alt="Story content"
+                        className="w-full h-full object-cover"
+                      />
+                    )}
+                    {/* Bottom Caption Overlay */}
+                    <div className="absolute bottom-16 left-4 right-4 bg-black/40 backdrop-blur-xs p-4 rounded-xl text-center z-10 border border-white/10">
+                      <h3 className="text-sm font-serif font-semibold text-white leading-relaxed">
+                        {currentStory.caption}
+                      </h3>
+                      <p className="text-[10px] text-white/60 mt-1 font-medium">
+                        {currentStory.isPermanent ? 'Featured Highlight' : 'Expiring in 24h'}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  /* Simulated photo layout */
+                  <div className="w-full h-full rounded-lg border border-white/10 bg-bg-alt/10 flex flex-col justify-between items-center py-20 px-6 text-center">
+                    <div className="w-20 h-20 rounded-full bg-primary/20 text-primary flex items-center justify-center">
+                      <Utensils className="w-10 h-10" />
+                    </div>
+                    <div className="space-y-4">
+                      <h3 className="text-xl font-serif font-bold text-white">
+                        {currentStory.caption}
+                      </h3>
+                      <p className="text-xs text-white/50">
+                        Posted recently · Expiring in 24h
+                      </p>
+                    </div>
                   </div>
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-serif font-bold text-white">
-                      {currentStory.caption}
-                    </h3>
-                    <p className="text-xs text-white/50">
-                      Posted recently · Expiring in 24h
-                    </p>
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Navigation overlays */}

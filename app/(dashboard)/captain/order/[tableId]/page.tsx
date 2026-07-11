@@ -12,6 +12,8 @@ import { useToast } from '@/components/ui/Toast';
 import { ArrowLeft, Send, Receipt, Undo2, Plus, Minus, Info } from 'lucide-react';
 import Link from 'next/link';
 
+import { useScopedAccess } from '@/lib/hooks/useScopedAccess';
+
 export default function CaptainTakeOrderPage() {
   const params = useParams();
   const router = useRouter();
@@ -20,14 +22,26 @@ export default function CaptainTakeOrderPage() {
   const { user } = useAuth();
   const { tables, menuItems, updateTableStatus } = useApp();
   const { toast } = useToast();
+  const { checkTableAccess } = useScopedAccess();
 
-  const table = tables.find(t => t.id === tableId);
+  const { isAuthorized, table } = checkTableAccess(tableId);
   const items = menuItems.filter(m => m.restaurantId === user?.restaurantId);
 
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
   const [preparationNote, setPreparationNote] = useState('');
   const [cart, setCart] = useState<{ [itemId: string]: number }>({});
+
+  useEffect(() => {
+    if (table && !isAuthorized) {
+      toast({
+        type: 'error',
+        title: 'Access Denied',
+        description: 'You are not authorized to view or manage this table.'
+      });
+      router.replace('/captain');
+    }
+  }, [isAuthorized, table, router, toast]);
 
   useEffect(() => {
     if (table && table.activeSession) {
@@ -45,10 +59,10 @@ export default function CaptainTakeOrderPage() {
     }
   }, [table]);
 
-  if (!table) {
+  if (!table || !isAuthorized) {
     return (
       <div className="max-w-xl mx-auto px-4 py-8 text-center">
-        <h3 className="text-sm font-serif font-bold text-ink">Table Not Found</h3>
+        <h3 className="text-sm font-serif font-bold text-ink">Access Denied / Table Not Found</h3>
         <Link href="/captain">
           <Button variant="primary" className="mt-4">Back to Grid</Button>
         </Link>

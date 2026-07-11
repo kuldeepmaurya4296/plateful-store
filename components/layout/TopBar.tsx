@@ -18,6 +18,8 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
 
   // Resolve section name from route
   const getSectionName = () => {
+    if (pathname.includes('/superadmin/owners')) return 'Merchant Owner Directory';
+    if (pathname.includes('/superadmin/customers')) return 'Customer Account Center';
     if (pathname.includes('/manager/tables')) return 'Table Management';
     if (pathname.includes('/manager/orders')) return 'Online Orders';
     if (pathname.includes('/manager/billing')) return 'Billing History';
@@ -26,13 +28,20 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
     if (pathname.includes('/manager/menu')) return 'Menu Management';
     if (pathname.includes('/manager/social')) return 'Manage Social Page';
     if (pathname.includes('/manager/account')) return 'Owner Account';
+    if (pathname.includes('/manager/staff')) return 'Staff & Roster Console';
+    if (pathname.includes('/manager/customers')) return 'Restaurant Customer Database';
+    if (pathname.includes('/manager/reviews')) return 'Review Management Portal';
     if (pathname.includes('/captain/order')) return 'Take Table Order';
     if (pathname.includes('/captain/settlement')) return 'Close Out Table';
     if (pathname.includes('/captain/account')) return 'Captain Account';
+    if (pathname.includes('/captain/bookings')) return 'Incoming Table Bookings';
     if (pathname.includes('/captain')) return 'Captain Table Grid';
-    if (pathname.includes('/customer/account')) return 'My Account';
+    if (pathname.includes('/customer/account')) return 'My Profile';
     if (pathname.includes('/customer/orders')) return 'My Orders';
     if (pathname.includes('/customer/bookings')) return 'Dine-in Bookings';
+    if (pathname.includes('/customer/notifications')) return 'Notification Hub';
+    if (pathname.includes('/customer/messages')) return 'Direct Messages';
+    if (pathname.includes('/customer/restaurant')) return 'Restaurant Discovery';
     if (pathname.includes('/customer')) return 'Spice Route Discovery';
     return 'Spice Route';
   };

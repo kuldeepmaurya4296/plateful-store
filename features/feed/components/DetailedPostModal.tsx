@@ -42,16 +42,42 @@ export const DetailedPostModal: React.FC = () => {
   const [videoProgress, setVideoProgress] = useState(35);
 
   const post = posts.find(p => p.id === activeDetailedPostId);
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
 
-  // Load comments
+  // Load comments & media URL
   useEffect(() => {
-    if (activeDetailedPostId) {
-      const existing = INITIAL_COMMENTS[activeDetailedPostId] || post?.commentsList || [];
+    let active = true;
+    let objectUrlToCleanup: string | null = null;
+
+    if (activeDetailedPostId && post) {
+      const existing = INITIAL_COMMENTS[activeDetailedPostId] || post.commentsList || [];
       setComments(existing);
       setActiveMediaIndex(0);
       setIsPlaying(true);
       setVideoProgress(20 + Math.random() * 50); // random progress simulation
+
+      if (post.photoUrl && post.photoUrl.startsWith('indexeddb://')) {
+        const key = post.photoUrl.replace('indexeddb://', '');
+        import('@/lib/indexedDb').then(({ getBlob }) => {
+          getBlob(key).then(blob => {
+            if (blob && active) {
+              const url = URL.createObjectURL(blob);
+              objectUrlToCleanup = url;
+              setMediaUrl(url);
+            }
+          });
+        });
+      } else {
+        setMediaUrl(post.photoUrl || null);
+      }
     }
+
+    return () => {
+      active = false;
+      if (objectUrlToCleanup) {
+        URL.revokeObjectURL(objectUrlToCleanup);
+      }
+    };
   }, [activeDetailedPostId, post]);
 
   if (!activeDetailedPostId || !post) return null;
@@ -76,16 +102,8 @@ export const DetailedPostModal: React.FC = () => {
       time: 'Just now'
     };
 
-    const updatedComments = [...comments, newComment];
-    setComments(updatedComments);
+    setComments(prev => [...prev, newComment]);
     commentOnPost(post.id, newCommentText);
-    
-    // Store in global reference
-    if (!INITIAL_COMMENTS[post.id]) {
-      INITIAL_COMMENTS[post.id] = [];
-    }
-    INITIAL_COMMENTS[post.id].push(newComment);
-
     setNewCommentText('');
     toast({
       type: 'success',
@@ -95,8 +113,8 @@ export const DetailedPostModal: React.FC = () => {
   };
 
   // Mock list of secondary carousel items
-  const postMedia = post.galleryNames || [post.caption.split('#')[0]];
-  const isVideo = post.authorType === 'restaurant' && post.id === 'p1'; // mock p1 as video
+  const postMedia = (post as any).galleryNames || [post.caption.split('#')[0]];
+  const isVideo = (post as any).mediaType === 'video' || (post.authorType === 'restaurant' && post.id === 'p1'); // mock or real video
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4 overflow-y-auto">
@@ -118,9 +136,32 @@ export const DetailedPostModal: React.FC = () => {
 
           {/* Render media */}
           <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
-            {post.isMockGradient ? (
+            {mediaUrl ? (
+              <div className="w-full h-full relative flex items-center justify-center bg-black">
+                <Badge variant={post.isVeg ? 'success' : 'danger'} className="absolute top-4 right-4 z-10">
+                  {post.isVeg ? 'Veg' : 'Non-Veg'}
+                </Badge>
+                {isVideo ? (
+                  <video
+                    src={mediaUrl}
+                    className={`w-full h-full object-contain ${(post as any).filterClass}`}
+                    autoPlay={isPlaying}
+                    loop
+                    muted={isMuted}
+                    playsInline
+                  />
+                ) : (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={mediaUrl}
+                    alt="Plating detail"
+                    className={`w-full h-full object-contain ${(post as any).filterClass}`}
+                  />
+                )}
+              </div>
+            ) : (post as any).isMockGradient ? (
               // Gradient Mock
-              <div className={`w-full h-full bg-gradient-to-tr ${post.mockGradientStyle} ${post.filterClass} flex flex-col justify-center items-center text-center p-8 text-white relative`}>
+              <div className={`w-full h-full bg-gradient-to-tr ${(post as any).mockGradientStyle} ${(post as any).filterClass} flex flex-col justify-center items-center text-center p-8 text-white relative`}>
                 <Badge variant={post.isVeg ? 'success' : 'danger'} className="absolute top-4 right-4">
                   {post.isVeg ? 'Veg' : 'Non-Veg'}
                 </Badge>
@@ -250,19 +291,19 @@ export const DetailedPostModal: React.FC = () => {
             </p>
 
             {/* Plating specific ratings breakups */}
-            {post.detailedRatings && (
+            {(post as any).detailedRatings && (
               <div className="grid grid-cols-3 gap-2 text-[9px] bg-bg border border-line rounded-lg p-2 font-medium">
                 <div className="text-center space-y-0.5 border-r border-line">
                   <span className="text-ink-soft block uppercase tracking-wider scale-90">Plating</span>
-                  <span className="font-bold text-primary">{post.detailedRatings.plating} ★</span>
+                  <span className="font-bold text-primary">{(post as any).detailedRatings.plating} ★</span>
                 </div>
                 <div className="text-center space-y-0.5 border-r border-line">
                   <span className="text-ink-soft block uppercase tracking-wider scale-90">Taste</span>
-                  <span className="font-bold text-primary">{post.detailedRatings.taste} ★</span>
+                  <span className="font-bold text-primary">{(post as any).detailedRatings.taste} ★</span>
                 </div>
                 <div className="text-center space-y-0.5">
                   <span className="text-ink-soft block uppercase tracking-wider scale-90">Ambiance</span>
-                  <span className="font-bold text-primary">{post.detailedRatings.ambiance} ★</span>
+                  <span className="font-bold text-primary">{(post as any).detailedRatings.ambiance} ★</span>
                 </div>
               </div>
             )}
