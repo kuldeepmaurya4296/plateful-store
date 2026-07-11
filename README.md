@@ -1,4 +1,4 @@
-<![CDATA[<div align="center">
+<div align="center">
 
 # 🍽️ Plateful
 
@@ -22,8 +22,8 @@
 - 💳 **SaaS Subscription Gating** — Tiered plans (Basic / Premium / Enterprise) with feature locks
 - 📱 **Fully Responsive** — Desktop sidebar + mobile bottom nav + drawer navigation
 - 🎨 **Premium Design System** — Warm terracotta theme, glassmorphism, Framer Motion animations
-- ♿ **Accessible** — Global `focus-visible` keyboard navigation rings
-- 🧩 **Centralized Navigation** — Single-source `navigation.ts` config drives all nav surfaces
+- ♿ **Accessible** — Global focus-visible keyboard navigation rings
+- 🧩 **Centralized Navigation** — Single-source navigation.ts config drives all nav surfaces
 - 📊 **Analytics & Charts** — Built-in Recharts dashboards for revenue, orders, and operations
 
 ---
@@ -141,7 +141,7 @@ Full dining experience from discovery to ordering and social engagement.
 
 ## 💳 SaaS Subscription Plans
 
-Feature gating is enforced client-side via the `SaaSUpgradeGate` component. Locked pages display a premium upgrade overlay.
+Feature gating is enforced client-side via the SaaSUpgradeGate component. Locked pages display a premium upgrade overlay.
 
 | Feature | Basic ₹1,999/mo | Premium ₹4,999/mo | Enterprise ₹9,999/mo |
 |:--------|:---:|:---:|:---:|
@@ -161,30 +161,33 @@ Feature gating is enforced client-side via the `SaaSUpgradeGate` component. Lock
 ## 🧩 Component Library
 
 ### Layout Components
+
 | Component | File | Purpose |
 |:----------|:-----|:--------|
-| `DashboardShell` | `components/layout/DashboardShell.tsx` | Main layout wrapper with sidebar + mobile drawer |
-| `Sidebar` | `components/layout/Sidebar.tsx` | Desktop navigation sidebar |
-| `TopBar` | `components/layout/TopBar.tsx` | Header with dynamic page titles & actions |
-| `BottomNav` | `components/layout/BottomNav.tsx` | Mobile-only bottom navigation bar |
+| DashboardShell | components/layout/DashboardShell.tsx | Main layout wrapper with sidebar + mobile drawer |
+| Sidebar | components/layout/Sidebar.tsx | Desktop navigation sidebar |
+| TopBar | components/layout/TopBar.tsx | Header with dynamic page titles & actions |
+| BottomNav | components/layout/BottomNav.tsx | Mobile-only bottom navigation bar |
 
 ### UI Primitives
+
 | Component | File | Purpose |
 |:----------|:-----|:--------|
-| `Button` | `components/ui/Button.tsx` | Primary, secondary, ghost button variants |
-| `Badge` | `components/ui/Badge.tsx` | Status indicators with color coding |
-| `Card` | `components/ui/Card.tsx` | Content container with elevation |
-| `Modal` | `components/ui/Modal.tsx` | Overlay dialog with backdrop |
-| `Input` | `components/ui/Input.tsx` | Styled form input |
-| `Toast` | `components/ui/Toast.tsx` | Notification toasts with auto-dismiss |
-| `FileUpload` | `components/ui/FileUpload.tsx` | Drag & drop file upload zone |
-| `StarRating` | `components/ui/StarRating.tsx` | Interactive star rating input/display |
+| Button | components/ui/Button.tsx | Primary, secondary, ghost button variants |
+| Badge | components/ui/Badge.tsx | Status indicators with color coding |
+| Card | components/ui/Card.tsx | Content container with elevation |
+| Modal | components/ui/Modal.tsx | Overlay dialog with backdrop |
+| Input | components/ui/Input.tsx | Styled form input |
+| Toast | components/ui/Toast.tsx | Notification toasts with auto-dismiss |
+| FileUpload | components/ui/FileUpload.tsx | Drag & drop file upload zone |
+| StarRating | components/ui/StarRating.tsx | Interactive star rating input/display |
 
 ### Shared Guards
+
 | Component | File | Purpose |
 |:----------|:-----|:--------|
-| `RoleGuard` | `components/shared/RoleGuard.tsx` | Route protection by user role |
-| `SaaSUpgradeGate` | `components/shared/SaaSUpgradeGate.tsx` | Feature gating with upgrade prompt overlay |
+| RoleGuard | components/shared/RoleGuard.tsx | Route protection by user role |
+| SaaSUpgradeGate | components/shared/SaaSUpgradeGate.tsx | Feature gating with upgrade prompt overlay |
 
 ---
 
@@ -207,8 +210,8 @@ Feature gating is enforced client-side via the `SaaSUpgradeGate` component. Lock
 
 ### Prerequisites
 
-- **Node.js** ≥ 18.x
-- **npm** ≥ 9.x
+- **Node.js** >= 18.x
+- **npm** >= 9.x
 
 ### Installation
 
@@ -253,11 +256,11 @@ npx tsc --noEmit
 
 | Role | Username | Password | Restaurant | Access Level |
 |:-----|:---------|:---------|:-----------|:-------------|
-| **Superadmin** | `admin.saas` | `123456` | Platform Master | Full platform control |
-| **Owner** | `vikram.owner` | `123456` | Spice Route (Enterprise) | All features unlocked |
-| **Manager** | `priya.manager` | `123456` | Spice Route (Enterprise) | Operations + analytics |
-| **Manager** | `mocha.manager` | `123456` | Café Mocha (Basic) | Gated features visible |
-| **Captain** | `aman.captain` | `123456` | Spice Route (Enterprise) | Table & order console |
+| **Superadmin** | admin.saas | 123456 | Platform Master | Full platform control |
+| **Owner** | vikram.owner | 123456 | Spice Route (Enterprise) | All features unlocked |
+| **Manager** | priya.manager | 123456 | Spice Route (Enterprise) | Operations + analytics |
+| **Manager** | mocha.manager | 123456 | Cafe Mocha (Basic) | Gated features visible |
+| **Captain** | aman.captain | 123456 | Spice Route (Enterprise) | Table & order console |
 
 ---
 
@@ -265,23 +268,23 @@ npx tsc --noEmit
 
 | Module | Path | Description |
 |:-------|:-----|:------------|
-| `AppContext` | `lib/AppContext.tsx` | Global state provider — auth, restaurants, bills, bookings |
-| `navigation` | `lib/navigation.ts` | Centralized role-based nav config consumed by all nav components |
-| `types` | `lib/types/index.ts` | Shared TypeScript interfaces — `Post`, `Story`, `Bill`, `Booking`, `Restaurant` |
-| `hooks` | `lib/hooks/` | Custom hooks — `useObjectUrl`, `usePersistedState` |
-| `indexedDb` | `lib/indexedDb.ts` | Client-side IndexedDB persistence layer |
-| `animations` | `lib/animations.ts` | Shared Framer Motion animation presets |
-| `tableStateMachine` | `lib/tableStateMachine.ts` | FSM for table status transitions (Free → Occupied → Billing) |
-| `sanitize` | `lib/sanitize.ts` | Input sanitization against XSS |
+| AppContext | lib/AppContext.tsx | Global state provider — auth, restaurants, bills, bookings |
+| navigation | lib/navigation.ts | Centralized role-based nav config consumed by all nav components |
+| types | lib/types/index.ts | Shared TypeScript interfaces — Post, Story, Bill, Booking, Restaurant |
+| hooks | lib/hooks/ | Custom hooks — useObjectUrl, usePersistedState |
+| indexedDb | lib/indexedDb.ts | Client-side IndexedDB persistence layer |
+| animations | lib/animations.ts | Shared Framer Motion animation presets |
+| tableStateMachine | lib/tableStateMachine.ts | FSM for table status transitions (Free → Occupied → Billing) |
+| sanitize | lib/sanitize.ts | Input sanitization against XSS |
 
 ---
 
 ## ♿ Accessibility
 
-- **Keyboard Navigation**: All interactive elements have visible `focus-visible` outlines using the primary color
-- **Semantic HTML**: Proper heading hierarchy, landmark regions, and ARIA labels
-- **Responsive Design**: Fluid layouts with mobile-first breakpoints
-- **Color Contrast**: Warm terracotta palette meets WCAG contrast ratios
+- **Keyboard Navigation** — All interactive elements have visible focus-visible outlines using the primary color
+- **Semantic HTML** — Proper heading hierarchy, landmark regions, and ARIA labels
+- **Responsive Design** — Fluid layouts with mobile-first breakpoints
+- **Color Contrast** — Warm terracotta palette meets WCAG contrast ratios
 
 ---
 
@@ -294,4 +297,3 @@ This project is private and proprietary.
 <div align="center">
   <sub>Built with ❤️ using Next.js, React, and TypeScript</sub>
 </div>
-]]>
