@@ -37,7 +37,6 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
     if (pathname.includes('/captain/bookings')) return 'Incoming Table Bookings';
     if (pathname.includes('/captain')) return 'Captain Table Grid';
     if (pathname.includes('/customer/account')) return 'My Profile';
-    if (pathname.includes('/customer/orders')) return 'My Orders';
     if (pathname.includes('/customer/bookings')) return 'Dine-in Bookings';
     if (pathname.includes('/customer/notifications')) return 'Notification Hub';
     if (pathname.includes('/customer/messages')) return 'Direct Messages';

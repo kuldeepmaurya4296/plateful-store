@@ -4,19 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/features/auth/context/AuthContext';
-import { 
-  Home, 
-  Grid, 
-  ShoppingCart, 
-  Receipt, 
-  Users, 
-  Wallet, 
-  ChefHat, 
-  Share2, 
-  User, 
-  LogOut,
-  Sparkles
-} from 'lucide-react';
+import { LogOut, Sparkles } from 'lucide-react';
 
 import { navigationConfig } from '@/lib/navigation';
 

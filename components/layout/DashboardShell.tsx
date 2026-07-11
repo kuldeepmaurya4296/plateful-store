@@ -31,7 +31,7 @@ export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ childr
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
         {/* Top Header */}
-        <TopBar onMenuClick={() => setMobileMenuOpen(true)} />
+        {isDesktopConsole && <TopBar onMenuClick={() => setMobileMenuOpen(true)} />}
 
         {/* Dashboard Page Content */}
         <main className="flex-1 p-4 md:p-6 overflow-y-auto max-w-[1600px] w-full mx-auto">

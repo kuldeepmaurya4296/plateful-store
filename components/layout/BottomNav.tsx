@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import { useApp } from '@/lib/AppContext';
-import { Home, Search, User, Grid, LogOut, PlusSquare, Film } from 'lucide-react';
+
 
 import { navigationConfig } from '@/lib/navigation';
 
