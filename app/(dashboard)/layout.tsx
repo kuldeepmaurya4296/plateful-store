@@ -6,6 +6,8 @@ import { useAuth } from '@/features/auth/context/AuthContext';
 import { DashboardShell } from '@/components/layout/DashboardShell';
 import { motion, AnimatePresence } from 'framer-motion';
 import { pageTransition } from '@/lib/animations';
+import { CreatePostModal } from '@/features/feed/components/CreatePostModal';
+import { DetailedPostModal } from '@/features/feed/components/DetailedPostModal';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth();
@@ -67,6 +69,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         >
           {children}
         </motion.div>
+      </AnimatePresence>
+
+      {/* Global Modals for Social Features */}
+      <AnimatePresence>
+        <CreatePostModal />
+        <DetailedPostModal />
       </AnimatePresence>
     </DashboardShell>
   );

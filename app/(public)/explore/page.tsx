@@ -95,7 +95,7 @@ export default function ExploreFeedPage() {
         </div>
 
         {/* Quick QR Scanner Link */}
-        <Link href="/menu/t4" title="Scan Table QR">
+        <Link href="/customer/scan" title="Scan Table QR">
           <Button variant="ghost" size="sm" className="!p-2 border border-line bg-bg hover:bg-bg-alt rounded-lg">
             <QrCode className="w-4.5 h-4.5 text-ink-soft" />
           </Button>
@@ -135,13 +135,13 @@ export default function ExploreFeedPage() {
           <Utensils className="w-5 h-5" />
           <span className="text-[10px] mt-1 font-semibold">Feed</span>
         </Link>
-        <Link href="/login" className="flex flex-col items-center justify-center w-full h-full text-ink-soft hover:text-ink">
+        <Link href="/customer/scan" className="flex flex-col items-center justify-center w-full h-full text-ink-soft hover:text-ink">
           <QrCode className="w-5 h-5" />
           <span className="text-[10px] mt-1 font-medium">Scan QR</span>
         </Link>
-        <Link href="/login" className="flex flex-col items-center justify-center w-full h-full text-ink-soft hover:text-ink">
+        <Link href="/customer/search" className="flex flex-col items-center justify-center w-full h-full text-ink-soft hover:text-ink">
           <Search className="w-5 h-5" />
-          <span className="text-[10px] mt-1 font-medium">Log In</span>
+          <span className="text-[10px] mt-1 font-medium">Search</span>
         </Link>
       </div>
     </div>

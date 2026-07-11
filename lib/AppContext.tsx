@@ -58,6 +58,12 @@ interface AppContextType {
   updateTenantSubscription: (restaurantId: string, plan: string) => void;
   toggleTenantStatus: (restaurantId: string) => void;
   addTenantRestaurant: (restaurant: any) => void;
+
+  // Global UI Modal States
+  isCreatePostOpen: boolean;
+  setCreatePostOpen: (open: boolean) => void;
+  activeDetailedPostId: string | null;
+  setActiveDetailedPostId: (postId: string | null) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -77,6 +83,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [messages, setMessages] = useState<any[]>([]);
   const [counters, setCounters] = useState<any[]>([]);
   const [visits, setVisits] = useState<any[]>([]);
+  const [isCreatePostOpen, setCreatePostOpen] = useState(false);
+  const [activeDetailedPostId, setActiveDetailedPostId] = useState<string | null>(null);
 
   // Load Initial Data on Mount
   useEffect(() => {
@@ -313,7 +321,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       addTable,
       updateTenantSubscription,
       toggleTenantStatus,
-      addTenantRestaurant
+      addTenantRestaurant,
+      
+      isCreatePostOpen,
+      setCreatePostOpen,
+      activeDetailedPostId,
+      setActiveDetailedPostId
     }}>
       {children}
     </AppContext.Provider>

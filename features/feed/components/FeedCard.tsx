@@ -28,13 +28,25 @@ interface FeedCardProps {
 }
 
 export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
-  const { likePost } = useApp();
+  const { likePost, setActiveDetailedPostId } = useApp();
+  const [activeMediaIndex, setActiveMediaIndex] = React.useState(0);
+  const [isPlaying, setIsPlaying] = React.useState(true);
+  const [isMuted, setIsMuted] = React.useState(true);
 
-  const handleLike = () => {
+  const handleLike = (e: React.MouseEvent) => {
+    e.stopPropagation();
     likePost(post.id);
   };
 
+  const handleOpenDetails = () => {
+    setActiveDetailedPostId(post.id);
+  };
+
   const isRestaurant = post.authorType === 'restaurant';
+  
+  // Custom media mockups
+  const postMedia = (post as any).galleryNames || [post.caption.split('#')[0]];
+  const isVideo = post.authorType === 'restaurant' && post.id === 'p1'; // mock post p1 as video
 
   return (
     <Card hoverEffect className="w-full flex flex-col gap-4 overflow-hidden !p-0">
@@ -75,18 +87,118 @@ export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
         </Badge>
       </div>
 
-      {/* Main Post Media (Simulated with design wrapper) */}
-      <div className="bg-bg-alt/20 aspect-video w-full border-y border-line flex flex-col justify-center items-center p-8 text-center relative overflow-hidden">
-        {/* Dynamic image mockup */}
-        <div className="w-16 h-16 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-          <UtensilsIcon className="w-8 h-8" />
-        </div>
-        <Badge variant={post.isVeg ? 'success' : 'danger'} size="sm" className="absolute top-4 left-4 shadow-sm">
-          {post.isVeg ? 'Veg' : 'Non-Veg'}
-        </Badge>
-        <span className="text-xs font-serif font-semibold text-ink max-w-sm px-4">
-          {post.caption.split('#')[0]}
-        </span>
+      {/* Main Post Media (Carousel / Video / Gradient Mock) */}
+      <div 
+        onClick={handleOpenDetails}
+        className="bg-bg-alt/20 aspect-video w-full border-y border-line flex flex-col justify-center items-center relative overflow-hidden cursor-pointer group"
+      >
+        {/* Render media content */}
+        {(post as any).isMockGradient ? (
+          <div className={`w-full h-full bg-gradient-to-tr ${(post as any).mockGradientStyle} ${(post as any).filterClass} flex flex-col justify-center items-center text-center p-8 text-white relative`}>
+            <Badge variant={post.isVeg ? 'success' : 'danger'} size="sm" className="absolute top-4 left-4 shadow-sm">
+              {post.isVeg ? 'Veg' : 'Non-Veg'}
+            </Badge>
+            <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center mb-3">
+              <UtensilsIcon className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xs font-serif font-semibold max-w-sm px-4">
+              {postMedia[activeMediaIndex]}
+            </span>
+          </div>
+        ) : (
+          <div className="w-full h-full flex flex-col justify-center items-center p-8 text-center relative bg-bg-alt/25">
+            <Badge variant={post.isVeg ? 'success' : 'danger'} size="sm" className="absolute top-4 left-4 shadow-sm">
+              {post.isVeg ? 'Veg' : 'Non-Veg'}
+            </Badge>
+            
+            <div className="w-14 h-14 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
+              <UtensilsIcon className="w-7 h-7" />
+            </div>
+
+            <span className="text-xs font-serif font-semibold text-ink max-w-sm px-4">
+              {postMedia[activeMediaIndex]}
+            </span>
+
+            {/* Video Overlays */}
+            {isVideo && (
+              <div className="absolute inset-0 bg-black/10 flex items-center justify-center">
+                {isPlaying ? (
+                  <div className="w-10 h-10 rounded-full bg-black/30 flex items-center justify-center text-white scale-90 opacity-0 group-hover:opacity-100 group-hover:scale-100 transition-all">
+                    <span>⏸</span>
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full bg-black/60 flex items-center justify-center text-white scale-100 opacity-100">
+                    <span>▶</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Video mute/play controllers */}
+        {isVideo && (
+          <div className="absolute bottom-3 right-3 z-10 flex gap-2">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsMuted(!isMuted);
+              }}
+              className="w-7 h-7 rounded-full bg-black/45 backdrop-blur-xs text-white text-xs flex items-center justify-center hover:bg-black/65 cursor-pointer"
+            >
+              {isMuted ? '🔇' : '🔊'}
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsPlaying(!isPlaying);
+              }}
+              className="w-7 h-7 rounded-full bg-black/45 backdrop-blur-xs text-white text-xs flex items-center justify-center hover:bg-black/65 cursor-pointer"
+            >
+              {isPlaying ? '⏸' : '▶'}
+            </button>
+          </div>
+        )}
+
+        {/* Carousel indicator & dots */}
+        {postMedia.length > 1 && (
+          <>
+            <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1 z-10">
+              {postMedia.map((_: any, idx: number) => (
+                <span
+                  key={idx}
+                  className={`w-1.5 h-1.5 rounded-full transition-all ${
+                    idx === activeMediaIndex ? 'bg-primary w-3.5' : 'bg-black/30'
+                  }`}
+                />
+              ))}
+            </div>
+
+            {/* Left and Right navigation buttons */}
+            {activeMediaIndex > 0 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveMediaIndex(prev => prev - 1);
+                }}
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/25 text-white flex items-center justify-center hover:bg-black/45 text-xs font-bold cursor-pointer"
+              >
+                ‹
+              </button>
+            )}
+            {activeMediaIndex < postMedia.length - 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveMediaIndex(prev => prev + 1);
+                }}
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/25 text-white flex items-center justify-center hover:bg-black/45 text-xs font-bold cursor-pointer"
+              >
+                ›
+              </button>
+            )}
+          </>
+        )}
       </div>
 
       {/* Post Actions & Text details */}
@@ -100,7 +212,10 @@ export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
             <Heart className="w-4 h-4" />
             <span className="font-semibold">{post.likesCount}</span>
           </button>
-          <button className="flex items-center gap-1.5 text-xs text-ink-soft hover:text-primary transition-all cursor-pointer">
+          <button 
+            onClick={handleOpenDetails}
+            className="flex items-center gap-1.5 text-xs text-ink-soft hover:text-primary transition-all cursor-pointer"
+          >
             <MessageSquare className="w-4 h-4" />
             <span className="font-semibold">{post.commentsCount}</span>
           </button>

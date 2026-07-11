@@ -24,6 +24,12 @@ export default function ManagerTablesPage() {
   const [settlingPaymentMode, setSettlingPaymentMode] = useState<'Cash' | 'Card' | 'UPI'>('UPI');
   const [showSettleModal, setShowSettleModal] = useState(false);
 
+  // QR Code Flyer Generator state
+  const [qrAccentColor, setQrAccentColor] = useState('#C1502E');
+  const [qrFrameText, setQrFrameText] = useState('Scan to Order Table {X}');
+  const [qrLogoType, setQrLogoType] = useState<'sparkles' | 'chef' | 'none'>('sparkles');
+  const [qrDarkTheme, setQrDarkTheme] = useState(false);
+
   const selectedTable = tenantTables.find(t => t.id === selectedTableId);
 
   const getStatusColor = (status: string) => {
@@ -213,26 +219,151 @@ export default function ManagerTablesPage() {
         )}
       </div>
 
-      {/* QR Code Modal (FR-B.2.6) */}
+      {/* QR Code Modal (FR-B.2.6) - Flyer Poster Generator */}
       <Modal
         isOpen={showQRModal}
         onClose={() => setShowQRModal(false)}
-        title={`Table ${qrTableNumber} QR Menu Code`}
+        title={`Print Flyer & QR Code · Table ${qrTableNumber}`}
       >
-        <div className="text-center space-y-4 py-3">
-          <div className="w-40 h-40 bg-bg border border-line rounded-lg flex items-center justify-center mx-auto shadow-sm">
-            <QrCode className="w-28 h-28 text-ink animate-pulse" />
+        <div className="flex flex-col md:flex-row gap-6 py-2 text-left">
+          {/* Left Panel: Live Flyer Preview */}
+          <div className="flex-1 flex justify-center items-center bg-bg p-4 rounded-xl border border-line">
+            <div 
+              style={{
+                backgroundColor: qrDarkTheme ? '#221E18' : '#FFFFFF',
+                borderColor: qrAccentColor,
+                color: qrDarkTheme ? '#FAF7F2' : '#221E18'
+              }}
+              className="w-56 border-4 rounded-2xl p-5 shadow-lg text-center flex flex-col justify-between items-center h-80 transition-all select-none"
+            >
+              <div className="space-y-0.5">
+                <span className="font-serif font-extrabold text-sm tracking-wide block">Spice Route</span>
+                <span className="text-[8px] uppercase tracking-widest opacity-80 block">Table T{qrTableNumber}</span>
+              </div>
+
+              {/* Styled QR Code Box with dynamic color */}
+              <div className="w-28 h-28 bg-white border border-stone-200 rounded-lg p-2.5 flex items-center justify-center relative shadow-inner">
+                <QrCode style={{ color: qrAccentColor }} className="w-full h-full animate-pulse" />
+                
+                {/* Center Logo Overlay */}
+                {qrLogoType === 'sparkles' && (
+                  <div className="absolute w-6 h-6 rounded-full bg-white border border-stone-100 flex items-center justify-center shadow">
+                    <Sparkles style={{ color: qrAccentColor }} className="w-3.5 h-3.5" />
+                  </div>
+                )}
+                {qrLogoType === 'chef' && (
+                  <div className="absolute w-6 h-6 rounded-full bg-white border border-stone-100 flex items-center justify-center shadow">
+                    <span className="text-[10px]">👨‍🍳</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Dynamic Frame text */}
+              <div className="space-y-1">
+                <p className="text-[9px] font-bold leading-tight max-w-[150px] mx-auto uppercase tracking-wide">
+                  {qrFrameText.replace('{X}', `T${qrTableNumber}`)}
+                </p>
+                <p className="text-[7px] opacity-60 leading-none">Powered by Plateful</p>
+              </div>
+            </div>
           </div>
-          <div className="space-y-1">
-            <h4 className="text-sm font-serif font-bold text-ink">Spice Route QR Code</h4>
-            <p className="text-xs text-ink-soft leading-normal max-w-xs mx-auto">
-              Scan this code at Table {qrTableNumber} to open the visual menu directly on any smartphone.
-            </p>
-          </div>
-          <div className="pt-2">
-            <a href={`/menu/t${qrTableNumber}`} target="_blank" rel="noreferrer">
-              <Button variant="primary" size="sm">Open Scanned Menu</Button>
-            </a>
+
+          {/* Right Panel: Customize Controls */}
+          <div className="w-full md:w-60 flex flex-col justify-between gap-4">
+            <div className="space-y-3.5 text-xs text-ink">
+              
+              {/* Color accent selection */}
+              <div className="space-y-1.5">
+                <span className="text-[10px] font-bold text-ink-soft uppercase tracking-wider block">Accent Border Color</span>
+                <div className="flex gap-2">
+                  {[
+                    { hex: '#C1502E', name: 'Terracotta' },
+                    { hex: '#6E7456', name: 'Sage' },
+                    { hex: '#B8862E', name: 'Gold' },
+                    { hex: '#3B6EC1', name: 'Indigo' },
+                    { hex: '#221E18', name: 'Espresso' }
+                  ].map(color => (
+                    <button
+                      key={color.hex}
+                      onClick={() => setQrAccentColor(color.hex)}
+                      style={{ backgroundColor: color.hex }}
+                      className={`w-6 h-6 rounded-full border-2 cursor-pointer transition-all ${
+                        qrAccentColor === color.hex ? 'border-primary ring-2 ring-primary-soft scale-110' : 'border-white'
+                      }`}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Frame text templates */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-ink-soft uppercase tracking-wider">Poster Frame Text</label>
+                <select
+                  value={qrFrameText}
+                  onChange={e => setQrFrameText(e.target.value)}
+                  className="text-[11px] border border-line rounded p-1.5 bg-bg-card"
+                >
+                  <option value="Scan to Order Table {X}">Scan to Order Table {"{X}"}</option>
+                  <option value="Visual Menu & Reviews at Table {X}">Visual Menu at Table {"{X}"}</option>
+                  <option value="Review Us on Plateful Table {X}">Review Us on Plateful Table {"{X}"}</option>
+                </select>
+              </div>
+
+              {/* Center Logo style */}
+              <div className="flex flex-col gap-1">
+                <label className="text-[10px] font-bold text-ink-soft uppercase tracking-wider">Center Brand Logo</label>
+                <select
+                  value={qrLogoType}
+                  onChange={e => setQrLogoType(e.target.value as any)}
+                  className="text-[11px] border border-line rounded p-1.5 bg-bg-card"
+                >
+                  <option value="sparkles">Plateful Sparkles Logo</option>
+                  <option value="chef">Chef Tandoor Icon</option>
+                  <option value="none">No logo (Solid QR center)</option>
+                </select>
+              </div>
+
+              {/* Dark mode poster toggle */}
+              <label className="flex items-center gap-2 cursor-pointer font-semibold py-1">
+                <input
+                  type="checkbox"
+                  checked={qrDarkTheme}
+                  onChange={e => setQrDarkTheme(e.target.checked)}
+                  className="cursor-pointer"
+                />
+                <span className="text-[11px]">Dark Theme Poster Flyer</span>
+              </label>
+
+            </div>
+
+            {/* Print and Download Actions */}
+            <div className="space-y-2 pt-2 border-t border-line">
+              <div className="grid grid-cols-2 gap-2">
+                <Button 
+                  onClick={() => toast({ type: 'success', title: 'PDF Compiled', description: 'Table flyer PDF downloaded successfully.' })}
+                  variant="outline" 
+                  size="sm" 
+                  className="text-[10px] py-1.5"
+                >
+                  Download PDF
+                </Button>
+                <Button 
+                  onClick={() => toast({ type: 'info', title: 'Print Spooling', description: 'Table card sent to local receipt printer.' })}
+                  variant="outline" 
+                  size="sm" 
+                  className="text-[10px] py-1.5"
+                >
+                  Send to Print
+                </Button>
+              </div>
+              
+              <a href={`/menu/t${qrTableNumber}`} target="_blank" rel="noreferrer" className="block w-full">
+                <Button variant="primary" size="sm" className="w-full text-xs py-2 flex items-center justify-center gap-1">
+                  <span>Launch Scanned Menu</span>
+                </Button>
+              </a>
+            </div>
           </div>
         </div>
       </Modal>

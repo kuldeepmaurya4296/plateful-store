@@ -4,11 +4,13 @@ import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/features/auth/context/AuthContext';
-import { Home, Search, User, Grid, LogOut } from 'lucide-react';
+import { useApp } from '@/lib/AppContext';
+import { Home, Search, User, Grid, LogOut, PlusSquare, Film } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
+  const { setCreatePostOpen } = useApp();
 
   if (!user) return null;
 
@@ -21,7 +23,9 @@ export const BottomNav: React.FC = () => {
 
   const customerItems = [
     { name: 'Feed', href: '/customer', icon: Home },
-    { name: 'Search', href: '/customer/wishlist', icon: Search }, // Or Search page
+    { name: 'Search', href: '/customer/search', icon: Search },
+    { name: 'Create', href: '#create', icon: PlusSquare, isModal: true },
+    { name: 'Reels', href: '/customer/reels', icon: Film },
     { name: 'Account', href: '/customer/account', icon: User }
   ];
 
@@ -37,6 +41,19 @@ export const BottomNav: React.FC = () => {
       {items.map((item) => {
         const isActive = pathname === item.href;
         const Icon = item.icon;
+
+        if ('isModal' in item && item.isModal) {
+          return (
+            <button
+              key={item.name}
+              onClick={() => setCreatePostOpen(true)}
+              className="flex flex-col items-center justify-center w-full h-full transition-all text-ink-soft hover:text-primary cursor-pointer"
+            >
+              <Icon className="w-5 h-5 text-primary" />
+              <span className="text-[10px] mt-1 font-medium">{item.name}</span>
+            </button>
+          );
+        }
 
         return (
           <Link

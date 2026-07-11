@@ -80,9 +80,11 @@ export default function CustomerAccountPage() {
           </h2>
           <p className="text-xs text-ink-soft mt-0.5 font-medium">@{user?.username || 'riya.eats'}</p>
         </div>
-        <Button variant="ghost" size="sm" className="!p-2 border border-line bg-bg hover:bg-bg-alt rounded-lg">
-          <Settings className="w-4.5 h-4.5 text-ink-soft" />
-        </Button>
+        <Link href="/customer/settings">
+          <Button variant="ghost" size="sm" className="!p-2 border border-line bg-bg hover:bg-bg-alt rounded-lg">
+            <Settings className="w-4.5 h-4.5 text-ink-soft" />
+          </Button>
+        </Link>
       </div>
 
       {/* Grid Stats */}

@@ -1,16 +1,23 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import { useApp } from '@/lib/AppContext';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { Clock, LogOut, ShieldAlert, Sparkles, UserCheck } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
+import { Clock, LogOut, ShieldAlert, Sparkles, UserCheck, Sliders, Bell, Globe } from 'lucide-react';
 
 export default function CaptainAccountPage() {
   const { user, logout } = useAuth();
   const { counters } = useApp();
+  const { toast } = useToast();
+
+  const [soundEnabled, setSoundEnabled] = useState(true);
+  const [vibeEnabled, setVibeEnabled] = useState(true);
+  const [appLang, setAppLang] = useState('English');
+  const [autoLock, setAutoLock] = useState('5 min');
 
   const counter = counters.find(c => c.id === user?.counterId) || counters[0];
 
@@ -59,8 +66,103 @@ export default function CaptainAccountPage() {
         </div>
       </Card>
 
+      {/* Terminal Preferences settings card */}
+      <Card className="space-y-4 text-left text-xs text-ink">
+        <div className="flex items-center gap-1.5 border-b border-line pb-2.5">
+          <Sliders className="w-4 h-4 text-primary" />
+          <h3 className="font-serif font-bold text-ink">Terminal Preferences</h3>
+        </div>
+
+        <div className="space-y-3">
+          {/* Order alerts sound and vibration */}
+          <div className="flex items-center justify-between pb-1.5 border-b border-line/60">
+            <span className="font-semibold text-ink-soft">Order Sound Alerts</span>
+            <button
+              onClick={() => {
+                setSoundEnabled(!soundEnabled);
+                toast({
+                  type: 'info',
+                  title: 'Alert Settings Changed',
+                  description: `New order sound alerts ${!soundEnabled ? 'enabled' : 'muted'}.`
+                });
+              }}
+              className={`px-3 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${
+                soundEnabled 
+                  ? 'bg-success-bg text-success border-success/20' 
+                  : 'bg-bg-alt/30 border-line text-ink-soft'
+              }`}
+            >
+              {soundEnabled ? 'Enabled' : 'Muted'}
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between pb-1.5 border-b border-line/60">
+            <span className="font-semibold text-ink-soft">Haptic Vibration on tickets</span>
+            <button
+              onClick={() => {
+                setVibeEnabled(!vibeEnabled);
+                toast({
+                  type: 'info',
+                  title: 'Haptic Settings Changed',
+                  description: `Ticket vibration feedback ${!vibeEnabled ? 'activated' : 'deactivated'}.`
+                });
+              }}
+              className={`px-3 py-1 rounded text-[10px] font-bold border transition-all cursor-pointer ${
+                vibeEnabled 
+                  ? 'bg-success-bg text-success border-success/20' 
+                  : 'bg-bg-alt/30 border-line text-ink-soft'
+              }`}
+            >
+              {vibeEnabled ? 'Active' : 'Disabled'}
+            </button>
+          </div>
+
+          {/* Languages */}
+          <div className="flex items-center justify-between pb-1.5 border-b border-line/60">
+            <span className="font-semibold text-ink-soft">Console Language</span>
+            <select
+              value={appLang}
+              onChange={e => {
+                setAppLang(e.target.value);
+                toast({
+                  type: 'success',
+                  title: 'Language Updated',
+                  description: `Console translated to ${e.target.value}.`
+                });
+              }}
+              className="text-[10px] font-bold p-1 px-2 border border-line rounded bg-bg-card text-ink"
+            >
+              <option value="English">English (EN)</option>
+              <option value="Hindi">Hindi (HI)</option>
+              <option value="Marathi">Marathi (MR)</option>
+            </select>
+          </div>
+
+          {/* Auto lock */}
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-ink-soft">Inactivity Auto-Lock</span>
+            <select
+              value={autoLock}
+              onChange={e => {
+                setAutoLock(e.target.value);
+                toast({
+                  type: 'info',
+                  title: 'Security Settings Updated',
+                  description: `Screen auto-lock timer configured to ${e.target.value}.`
+                });
+              }}
+              className="text-[10px] font-bold p-1 px-2 border border-line rounded bg-bg-card text-ink"
+            >
+              <option value="2 min">2 Minutes</option>
+              <option value="5 min">5 Minutes</option>
+              <option value="never">Never Lock</option>
+            </select>
+          </div>
+        </div>
+      </Card>
+
       {/* Handover Notice */}
-      <Card className="bg-bg-alt/30 space-y-2">
+      <Card className="bg-bg-alt/30 space-y-2 text-left">
         <div className="flex gap-2 items-start">
           <ShieldAlert className="w-4.5 h-4.5 text-ink-soft mt-0.5" />
           <h4 className="text-xs font-semibold text-ink">Shift Handover Notice</h4>
@@ -76,7 +178,7 @@ export default function CaptainAccountPage() {
           variant="outline"
           fullWidth
           onClick={logout}
-          className="flex items-center gap-2 justify-center py-3 text-danger border-danger/20 hover:bg-danger-bg/25 hover:border-danger/30"
+          className="flex items-center gap-2 justify-center py-3 text-danger border-danger/20 hover:bg-danger-bg/25 hover:border-danger/30 cursor-pointer"
         >
           <LogOut className="w-4.5 h-4.5" />
           <span>Clock Out & Log Off</span>
