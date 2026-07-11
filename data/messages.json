@@ -1,0 +1,18 @@
+[
+  {
+    "id": "msg1",
+    "restaurantId": "r1",
+    "userId": "u1",
+    "sender": "customer",
+    "text": "Hi, do you have any gluten-free bread options available?",
+    "createdAt": "2026-07-11T14:30:00+05:30"
+  },
+  {
+    "id": "msg2",
+    "restaurantId": "r1",
+    "userId": "u1",
+    "sender": "restaurant",
+    "text": "Hello! Yes, we have gluten-free rotis and can customize certain gravies for you. Please let your captain know when you scan the QR code!",
+    "createdAt": "2026-07-11T14:35:00+05:30"
+  }
+]

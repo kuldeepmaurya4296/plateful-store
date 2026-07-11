@@ -1,0 +1,75 @@
+[
+  {
+    "id": "u1",
+    "name": "Riya Kapoor",
+    "email": "riya@example.com",
+    "phone": "+91-9876543210",
+    "role": "customer",
+    "avatar": "RK",
+    "username": "riya.eats",
+    "preferences": {
+      "dietFilter": "veg",
+      "city": "Mumbai"
+    },
+    "followedRestaurants": ["r1", "r2"],
+    "wishlist": ["r1"]
+  },
+  {
+    "id": "u_rahul",
+    "name": "Rahul Sharma",
+    "email": "rahul@example.com",
+    "phone": "+91-9811122233",
+    "role": "customer",
+    "avatar": "RS",
+    "username": "rahul.foodie",
+    "preferences": {
+      "dietFilter": "both",
+      "city": "Mumbai"
+    },
+    "followedRestaurants": ["r1"],
+    "wishlist": []
+  },
+  {
+    "id": "u2",
+    "name": "Vikram Mehta",
+    "role": "owner",
+    "username": "vikram.owner",
+    "restaurantId": "r1",
+    "avatar": "VM"
+  },
+  {
+    "id": "u3",
+    "name": "Priya Nair",
+    "role": "manager",
+    "username": "priya.manager",
+    "restaurantId": "r1",
+    "avatar": "PN"
+  },
+  {
+    "id": "u4",
+    "name": "Aman Joshi",
+    "role": "captain",
+    "username": "aman.captain",
+    "restaurantId": "r1",
+    "counterId": "c1",
+    "assignedTables": ["t1", "t2", "t3", "t4", "t5", "t6", "t7", "t8"],
+    "avatar": "AJ"
+  },
+  {
+    "id": "u5",
+    "name": "Rohit Verma",
+    "role": "captain",
+    "username": "rohit.captain",
+    "restaurantId": "r1",
+    "counterId": "c2",
+    "assignedTables": ["t9", "t10", "t11", "t12"],
+    "avatar": "RV"
+  },
+  {
+    "id": "u_super",
+    "name": "SaaS Platform Admin",
+    "role": "superadmin",
+    "username": "admin.saas",
+    "avatar": "SA"
+  }
+]

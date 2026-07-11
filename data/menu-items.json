@@ -1,0 +1,98 @@
+[
+  {
+    "id": "m1",
+    "restaurantId": "r1",
+    "name": "Volcano paneer tikka",
+    "price": 320,
+    "category": "Starters",
+    "isVeg": true,
+    "isAvailable": true,
+    "description": "Smoky cottage cheese skewers marinated in hot spices, served with mint dip.",
+    "presentationNote": "Served hot on slate, garnished with micro-greens and dry-ice smoke effect.",
+    "image": "/images/paneer-tikka.jpg"
+  },
+  {
+    "id": "m2",
+    "restaurantId": "r1",
+    "name": "Galouti dream",
+    "price": 450,
+    "category": "Mains",
+    "isVeg": false,
+    "isAvailable": true,
+    "description": "Melt-in-mouth minced mutton patties spiced with house blend, served with saffron mini-naan.",
+    "presentationNote": "Plated with silver foil wrap, edible flower, and fresh rose petals.",
+    "image": "/images/galouti.jpg"
+  },
+  {
+    "id": "m3",
+    "restaurantId": "r1",
+    "name": "Truffle butter naan",
+    "price": 120,
+    "category": "Starters",
+    "isVeg": true,
+    "isAvailable": true,
+    "description": "Leavened flatbread baked in clay tandoor, brushed with truffle butter and fresh herbs.",
+    "presentationNote": "Folded into triangles, served in a warm canvas pouch.",
+    "image": "/images/truffle-naan.jpg"
+  },
+  {
+    "id": "m4",
+    "restaurantId": "r1",
+    "name": "Midnight cocoa cloud",
+    "price": 250,
+    "category": "Desserts",
+    "isVeg": true,
+    "isAvailable": true,
+    "description": "Rich 70% dark chocolate mousse resting on a flourless sponge, topped with cocoa dust.",
+    "presentationNote": "Presented inside a glass dome filled with cold cherry-smoke vapor.",
+    "image": "/images/cocoa-cloud.jpg"
+  },
+  {
+    "id": "m5",
+    "restaurantId": "r1",
+    "name": "Dahi ke sholey",
+    "price": 280,
+    "category": "Starters",
+    "isVeg": true,
+    "isAvailable": true,
+    "description": "Crispy bread rolls stuffed with spiced hung curd and fresh bell peppers.",
+    "presentationNote": "Sliced diagonally, served on a long ceramic dish with sweet chili dip.",
+    "image": "/images/dahi-sholey.jpg"
+  },
+  {
+    "id": "m6",
+    "restaurantId": "r1",
+    "name": "Murg malai kebab",
+    "price": 380,
+    "category": "Starters",
+    "isVeg": false,
+    "isAvailable": true,
+    "description": "Boneless chicken cubes marinated in cardamom-spiced cream and grilled to perfection.",
+    "presentationNote": "Threaded on brass skewers, served with onion rings and lemon wedges.",
+    "image": "/images/murgh-malai.jpg"
+  },
+  {
+    "id": "m7",
+    "restaurantId": "r2",
+    "name": "Smoked lamb chops",
+    "price": 550,
+    "category": "Starters",
+    "isVeg": false,
+    "isAvailable": true,
+    "description": "Hickory-smoked prime lamb chops brushed with a spicy BBQ glaze.",
+    "presentationNote": "Arranged upright, garnished with toasted sesame seeds and fresh chives.",
+    "image": "/images/lamb-chops.jpg"
+  },
+  {
+    "id": "m8",
+    "restaurantId": "r3",
+    "name": "Hot Fudge Affogato",
+    "price": 180,
+    "category": "Desserts",
+    "isVeg": true,
+    "isAvailable": true,
+    "description": "Double shot of hot espresso poured over Madagascar vanilla bean gelato.",
+    "presentationNote": "Served in a crystal cup with chocolate chip cookie on the side.",
+    "image": "/images/affogato.jpg"
+  }
+]

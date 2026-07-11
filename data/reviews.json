@@ -1,0 +1,26 @@
+[
+  {
+    "id": "rv1",
+    "visitId": "v1",
+    "restaurantId": "r1",
+    "userId": "u1",
+    "userName": "Riya Kapoor",
+    "foodRating": 5,
+    "presentationRating": 4,
+    "ambianceRating": 5,
+    "text": "The Truffle butter naan was delicious, fresh off the tawa! The Volcano paneer tikka presentation was visually stunning.",
+    "createdAt": "2026-07-11T18:10:00+05:30"
+  },
+  {
+    "id": "rv2",
+    "visitId": "v2",
+    "restaurantId": "r1",
+    "userId": "u_rahul",
+    "userName": "Rahul Sharma",
+    "foodRating": 4,
+    "presentationRating": 5,
+    "ambianceRating": 4,
+    "text": "Galouti dream was super soft and melted in my mouth. Excellent presentation with silver foil.",
+    "createdAt": "2026-07-11T17:45:00+05:30"
+  }
+]

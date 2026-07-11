@@ -1,0 +1,18 @@
+[
+  {
+    "id": "c1",
+    "name": "Counter 1",
+    "restaurantId": "r1",
+    "tableRange": "Tables 1-8",
+    "captainId": "u4",
+    "captainName": "Aman Joshi"
+  },
+  {
+    "id": "c2",
+    "name": "Counter 2",
+    "restaurantId": "r1",
+    "tableRange": "Tables 9-12",
+    "captainId": "u5",
+    "captainName": "Rohit Verma"
+  }
+]

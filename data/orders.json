@@ -1,0 +1,96 @@
+[
+  {
+    "id": "o1042",
+    "restaurantId": "r1",
+    "type": "online",
+    "items": [
+      {
+        "menuItemId": "m1",
+        "quantity": 2,
+        "name": "Volcano paneer tikka",
+        "price": 270
+      }
+    ],
+    "total": 540,
+    "status": "pending",
+    "createdAt": "2026-07-11T18:05:00+05:30",
+    "customerName": "Suresh Gupta",
+    "customerPhone": "+91-9922334455",
+    "deliveryAddress": "Flat 302, Sea Breeze, Bandra West"
+  },
+  {
+    "id": "o1041",
+    "restaurantId": "r1",
+    "type": "online",
+    "items": [
+      {
+        "menuItemId": "m2",
+        "quantity": 1,
+        "name": "Galouti dream",
+        "price": 450
+      },
+      {
+        "menuItemId": "m3",
+        "quantity": 2,
+        "name": "Truffle butter naan",
+        "price": 85
+      }
+    ],
+    "total": 620,
+    "status": "preparing",
+    "createdAt": "2026-07-11T17:55:00+05:30",
+    "customerName": "Amit Trivedi",
+    "customerPhone": "+91-9933445566",
+    "deliveryAddress": "Bunglow 12, Pali Hill, Bandra West"
+  },
+  {
+    "id": "o1040",
+    "restaurantId": "r1",
+    "type": "online",
+    "items": [
+      {
+        "menuItemId": "m4",
+        "quantity": 3,
+        "name": "Midnight cocoa cloud",
+        "price": 250
+      }
+    ],
+    "total": 750,
+    "status": "ready",
+    "createdAt": "2026-07-11T17:40:00+05:30",
+    "customerName": "Neha Kakkar",
+    "customerPhone": "+91-9944556677",
+    "deliveryAddress": "Silver Sands, Carter Road"
+  },
+  {
+    "id": "o1",
+    "restaurantId": "r1",
+    "type": "dine-in",
+    "tableId": "t4",
+    "items": [
+      {
+        "menuItemId": "m1",
+        "quantity": 1,
+        "name": "Volcano paneer tikka",
+        "price": 320
+      },
+      {
+        "menuItemId": "m3",
+        "quantity": 2,
+        "name": "Truffle butter naan",
+        "price": 120
+      },
+      {
+        "menuItemId": "m4",
+        "quantity": 1,
+        "name": "Midnight cocoa cloud",
+        "price": 250
+      }
+    ],
+    "total": 810,
+    "status": "preparing",
+    "createdAt": "2026-07-11T17:40:00+05:30",
+    "customerName": "Karan Johar",
+    "customerPhone": "+91-9833344455"
+  }
+]

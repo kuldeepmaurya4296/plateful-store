@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors — Warm premium restaurant palette */
+  --color-primary: #C1502E;           /* Terracotta accent */
+  --color-primary-soft: #F5E6DA;
+  --color-primary-hover: #A33A1C;
+  --color-secondary: #6E7456;         /* Sage green */
+  --color-secondary-soft: #EBECE6;
+  --color-amber-accent: #B8862E;      /* Warm gold/amber */
+  
+  --color-bg: #FAF7F2;                /* Warm paper background */
+  --color-bg-alt: #F1EAE0;            /* Muted background card */
+  --color-bg-card: #FFFFFF;           /* Card pure white */
+  
+  --color-ink: #221E18;               /* Espresso dark text */
+  --color-ink-soft: #6B6256;          /* Muted grey-brown text */
+  --color-line: #E3D9C8;              /* Soft borders */
+
+  /* Semantic status colors */
+  --color-success: #2E7D4F;
+  --color-success-bg: #E3F3EA;
+  --color-danger: #8B2E3F;
+  --color-danger-bg: #F6E2E6;
+  --color-warning: #9C7A14;
+  --color-warning-bg: #FBF0D6;
+  --color-info: #3B6EC1;
+  --color-info-bg: #E8F0FA;
+
+  /* Font mappings from variables in layout */
+  --font-serif: var(--font-serif), serif;
+  --font-sans: var(--font-sans), sans-serif;
+  --font-mono: 'Courier New', Courier, monospace;
+
+  /* Spacing & Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+}
+
+/* Custom Scrollbar for premium feel */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-ink-soft);
+}
+
+/* Base styles override */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  color: var(--color-ink);
+}
+
+/* Glassmorphism helpers */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(227, 217, 200, 0.5);
+}
+
+.glass-dark {
+  background: rgba(34, 30, 24, 0.8);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Input reset for elegant borders */
+input, select, textarea {
+  border: 1px solid var(--color-line);
+  background-color: var(--color-bg-card);
+  color: var(--color-ink);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease-in-out;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px var(--color-primary-soft);
+}

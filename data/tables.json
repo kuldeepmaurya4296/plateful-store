@@ -1,0 +1,236 @@
+[
+  {
+    "id": "t1",
+    "number": 1,
+    "capacity": 4,
+    "status": "available",
+    "counterId": "c1",
+    "restaurantId": "r1",
+    "qrToken": "qr_t1",
+    "activeSession": null
+  },
+  {
+    "id": "t2",
+    "number": 2,
+    "capacity": 2,
+    "status": "occupied",
+    "counterId": "c1",
+    "restaurantId": "r1",
+    "qrToken": "qr_t2",
+    "activeSession": {
+      "customerName": "Rahul Sharma",
+      "customerPhone": "+91-9811122233",
+      "startedBy": "u4",
+      "startedAt": "2026-07-11T17:30:00+05:30",
+      "items": [
+        {
+          "menuItemId": "m2",
+          "quantity": 1,
+          "name": "Galouti dream",
+          "price": 450
+        }
+      ],
+      "total": 450,
+      "preparationNote": "Make it spice level medium please"
+    }
+  },
+  {
+    "id": "t3",
+    "number": 3,
+    "capacity": 6,
+    "status": "billing",
+    "counterId": "c1",
+    "restaurantId": "r1",
+    "qrToken": "qr_t3",
+    "activeSession": {
+      "customerName": "Preeti Sinha",
+      "customerPhone": "+91-9822233344",
+      "startedBy": "u4",
+      "startedAt": "2026-07-11T17:15:00+05:30",
+      "items": [
+        {
+          "menuItemId": "m1",
+          "quantity": 1,
+          "name": "Volcano paneer tikka",
+          "price": 320
+        },
+        {
+          "menuItemId": "m3",
+          "quantity": 2,
+          "name": "Truffle butter naan",
+          "price": 120
+        }
+      ],
+      "total": 560,
+      "preparationNote": ""
+    }
+  },
+  {
+    "id": "t4",
+    "number": 4,
+    "capacity": 4,
+    "status": "occupied",
+    "counterId": "c1",
+    "restaurantId": "r1",
+    "qrToken": "qr_t4",
+    "activeSession": {
+      "customerName": "Karan Johar",
+      "customerPhone": "+91-9833344455",
+      "startedBy": "u4",
+      "startedAt": "2026-07-11T17:40:00+05:30",
+      "items": [
+        {
+          "menuItemId": "m1",
+          "quantity": 1,
+          "name": "Volcano paneer tikka",
+          "price": 320
+        },
+        {
+          "menuItemId": "m3",
+          "quantity": 2,
+          "name": "Truffle butter naan",
+          "price": 120
+        },
+        {
+          "menuItemId": "m4",
+          "quantity": 1,
+          "name": "Midnight cocoa cloud",
+          "price": 250
+        }
+      ],
+      "total": 810,
+      "preparationNote": "No onions in the garnish"
+    }
+  },
+  {
+    "id": "t5",
+    "number": 5,
+    "capacity": 4,
+    "status": "available",
+    "counterId": "c1",
+    "restaurantId": "r1",
+    "qrToken": "qr_t5",
+    "activeSession": null
+  },
+  {
+    "id": "t6",
+    "number": 6,
+    "capacity": 8,
+    "status": "available",
+    "counterId": "c1",
+    "restaurantId": "r1",
+    "qrToken": "qr_t6",
+    "activeSession": null
+  },
+  {
+    "id": "t7",
+    "number": 7,
+    "capacity": 4,
+    "status": "occupied",
+    "counterId": "c1",
+    "restaurantId": "r1",
+    "qrToken": "qr_t7",
+    "activeSession": {
+      "customerName": "Anil Kapoor",
+      "customerPhone": "+91-9844455566",
+      "startedBy": "u4",
+      "startedAt": "2026-07-11T17:50:00+05:30",
+      "items": [
+        {
+          "menuItemId": "m5",
+          "quantity": 2,
+          "name": "Dahi ke sholey",
+          "price": 280
+        }
+      ],
+      "total": 560,
+      "preparationNote": ""
+    }
+  },
+  {
+    "id": "t8",
+    "number": 8,
+    "capacity": 6,
+    "status": "billing",
+    "counterId": "c1",
+    "restaurantId": "r1",
+    "qrToken": "qr_t8",
+    "activeSession": {
+      "customerName": "Sunil Dutt",
+      "customerPhone": "+91-9855566677",
+      "startedBy": "u4",
+      "startedAt": "2026-07-11T17:10:00+05:30",
+      "items": [
+        {
+          "menuItemId": "m2",
+          "quantity": 2,
+          "name": "Galouti dream",
+          "price": 450
+        },
+        {
+          "menuItemId": "m4",
+          "quantity": 2,
+          "name": "Midnight cocoa cloud",
+          "price": 250
+        }
+      ],
+      "total": 1400,
+      "preparationNote": ""
+    }
+  },
+  {
+    "id": "t9",
+    "number": 9,
+    "capacity": 4,
+    "status": "occupied",
+    "counterId": "c2",
+    "restaurantId": "r1",
+    "qrToken": "qr_t9",
+    "activeSession": {
+      "customerName": "Ayesha Roy",
+      "customerPhone": "+91-9866677788",
+      "startedBy": "u5",
+      "startedAt": "2026-07-11T17:45:00+05:30",
+      "items": [
+        {
+          "menuItemId": "m6",
+          "quantity": 1,
+          "name": "Murg malai kebab",
+          "price": 380
+        }
+      ],
+      "total": 380,
+      "preparationNote": "Serve as soon as ready"
+    }
+  },
+  {
+    "id": "t10",
+    "number": 10,
+    "capacity": 2,
+    "status": "available",
+    "counterId": "c2",
+    "restaurantId": "r1",
+    "qrToken": "qr_t10",
+    "activeSession": null
+  },
+  {
+    "id": "t11",
+    "number": 11,
+    "capacity": 4,
+    "status": "available",
+    "counterId": "c2",
+    "restaurantId": "r1",
+    "qrToken": "qr_t11",
+    "activeSession": null
+  },
+  {
+    "id": "t12",
+    "number": 12,
+    "capacity": 6,
+    "status": "available",
+    "counterId": "c2",
+    "restaurantId": "r1",
+    "qrToken": "qr_t12",
+    "activeSession": null
+  }
+]

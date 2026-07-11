@@ -1,0 +1,53 @@
+[
+  {
+    "id": "r1",
+    "name": "Spice Route",
+    "city": "Mumbai",
+    "address": "Bandra West, Mumbai",
+    "cuisine": "North Indian",
+    "rating": 4.6,
+    "reviewCount": 128,
+    "avatar": "SR",
+    "description": "Authentic North Indian cuisines featuring traditional tandoor items and artisanal curries.",
+    "phone": "+91-9988776655",
+    "email": "contact@spiceroute.com",
+    "features": ["Veg", "Non-Veg", "Dine-in", "Pre-book"],
+    "coverImage": "/images/spice-route.jpg",
+    "subscriptionPlan": "Enterprise",
+    "subscriptionStatus": "Active"
+  },
+  {
+    "id": "r2",
+    "name": "Grill House",
+    "city": "Mumbai",
+    "address": "Andheri West, Mumbai",
+    "cuisine": "BBQ & Grills",
+    "rating": 4.3,
+    "reviewCount": 89,
+    "avatar": "GH",
+    "description": "Smoked grills, barbecued kebabs, and a live grill table experience.",
+    "phone": "+91-9988776644",
+    "email": "contact@grillhouse.com",
+    "features": ["Non-Veg", "Dine-in", "Bar"],
+    "coverImage": "/images/grill-house.jpg",
+    "subscriptionPlan": "Premium",
+    "subscriptionStatus": "Active"
+  },
+  {
+    "id": "r3",
+    "name": "Cafe Mocha",
+    "city": "Mumbai",
+    "address": "Powai, Mumbai",
+    "cuisine": "Cafe & Desserts",
+    "rating": 4.5,
+    "reviewCount": 215,
+    "avatar": "CM",
+    "description": "Artisanal coffees, hand-crafted chocolates, and high-quality desserts in an ambient setting.",
+    "phone": "+91-9988776633",
+    "email": "hello@cafemocha.com",
+    "features": ["Veg", "Dine-in", "Desserts"],
+    "coverImage": "/images/cafe-mocha.jpg",
+    "subscriptionPlan": "Basic",
+    "subscriptionStatus": "Active"
+  }
+]
