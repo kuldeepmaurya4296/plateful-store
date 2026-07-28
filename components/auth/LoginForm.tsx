@@ -11,6 +11,7 @@ import { motion } from 'framer-motion';
 import { Utensils, UserPlus, LogIn, Sparkles, User, Mail, Lock, AtSign, ArrowRight } from 'lucide-react';
 import { scaleUp } from '@/lib/animations';
 import { signIn } from 'next-auth/react';
+import { ForgotPasswordModal } from '@/components/auth/ForgotPasswordModal';
 
 export const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ export const LoginForm: React.FC = () => {
 
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [role, setRole] = useState<'customer' | 'owner' | 'manager' | 'captain' | 'superadmin'>('customer');
+  const [isForgotOpen, setIsForgotOpen] = useState(false);
   
   // Sign In state
   const [username, setUsername] = useState('');
@@ -241,9 +243,13 @@ export const LoginForm: React.FC = () => {
               />
 
               <div className="text-right">
-                <a href="#" className="text-xs text-primary hover:underline font-medium">
+                <button
+                  type="button"
+                  onClick={() => setIsForgotOpen(true)}
+                  className="text-xs text-primary hover:underline font-medium cursor-pointer"
+                >
                   Forgot password?
-                </a>
+                </button>
               </div>
 
               <Button type="submit" variant="primary" fullWidth disabled={isSubmitting} className="py-2.5 flex items-center justify-center gap-2">
@@ -321,6 +327,11 @@ export const LoginForm: React.FC = () => {
           )}
         </Card>
       </motion.div>
+
+      <ForgotPasswordModal
+        isOpen={isForgotOpen}
+        onClose={() => setIsForgotOpen(false)}
+      />
     </div>
   );
 };

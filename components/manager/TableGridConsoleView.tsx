@@ -300,22 +300,61 @@ export const TableGridConsoleView: React.FC = () => {
         </div>
       </Modal>
 
-      {/* QR Flyer Modal */}
+      {/* Printable QR Flyer Modal */}
       <Modal
         isOpen={showQRModal}
         onClose={() => setShowQRModal(false)}
-        title={`Table ${qrTableNumber} QR Code Flyer`}
+        title={`Table ${qrTableNumber} — Digital QR Menu Flyer`}
       >
         <div className="space-y-4 text-center">
-          <div className="p-6 bg-bg-card border-2 border-dashed border-line rounded-xl max-w-xs mx-auto space-y-3">
-            <div className="w-36 h-36 bg-ink text-bg flex items-center justify-center mx-auto rounded-lg font-mono text-xs">
-              [QR CODE Table-{qrTableNumber}]
+          <div className="p-6 bg-gradient-to-b from-bg-card to-bg-alt border-2 border-primary/30 rounded-2xl max-w-xs mx-auto space-y-4 shadow-xl">
+            <div className="inline-flex bg-primary/10 text-primary p-2 rounded-xl">
+              <QrCode className="w-6 h-6" />
             </div>
-            <p className="text-xs font-bold text-ink">Scan with smartphone camera to view visual menu & order directly</p>
+            <div>
+              <h4 className="font-serif font-bold text-xl text-ink">Spice Route</h4>
+              <p className="text-xs font-bold text-primary uppercase tracking-wider">Table {qrTableNumber}</p>
+            </div>
+
+            {/* High-res Simulated QR Code Frame */}
+            <div className="w-44 h-44 bg-white border-4 border-ink rounded-xl p-3 flex flex-col items-center justify-center mx-auto shadow-inner relative overflow-hidden">
+              {/* QR Pattern visual elements */}
+              <div className="grid grid-cols-5 gap-1.5 w-full h-full p-1 bg-ink/5 rounded">
+                {Array.from({ length: 25 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className={`rounded-xs ${
+                      i % 2 === 0 || i % 5 === 0 || i === 12 || i === 24
+                        ? 'bg-ink'
+                        : 'bg-transparent'
+                    }`}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <p className="text-[11px] font-semibold text-ink-soft leading-tight">
+              Scan with phone camera or Plateful scanner to view visual plating guides & place self-orders.
+            </p>
+
+            <span className="text-[10px] font-mono text-ink-soft/70 block border-t border-line/60 pt-2">
+              URL: http://localhost:3000/menu/t{qrTableNumber}
+            </span>
           </div>
-          <Button variant="primary" fullWidth onClick={() => window.print()}>
-            Print Table Flyer
-          </Button>
+
+          <div className="flex gap-2">
+            <Link
+              href={`/menu/t${qrTableNumber}`}
+              target="_blank"
+              className="flex-1 py-2.5 px-3 bg-bg-alt border border-line hover:border-primary/40 rounded-lg text-xs font-bold text-ink transition-all flex items-center justify-center gap-1.5"
+            >
+              <Smartphone className="w-4 h-4 text-primary" />
+              <span>Test Menu Link</span>
+            </Link>
+            <Button variant="primary" className="flex-1" onClick={() => window.print()}>
+              Print QR Sticker
+            </Button>
+          </div>
         </div>
       </Modal>
     </div>

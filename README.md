@@ -266,11 +266,11 @@ npx tsc --noEmit
 
 | Role | Username | Password | Restaurant | Access Level |
 |:-----|:---------|:---------|:-----------|:-------------|
-| **Superadmin** | admin.saas | 123456 | Platform Master | Full platform control |
-| **Owner** | vikram.owner | 123456 | Spice Route (Enterprise) | All features unlocked |
-| **Manager** | priya.manager | 123456 | Spice Route (Enterprise) | Operations + analytics |
-| **Manager** | mocha.manager | 123456 | Cafe Mocha (Basic) | Gated features visible |
-| **Captain** | aman.captain | 123456 | Spice Route (Enterprise) | Table & order console |
+| **Superadmin** | `admin.saas` | `Kuldeep@123` | Platform Master | Full platform control |
+| **Owner** | `vikram.owner` | `Kuldeep@123` | Spice Route (Enterprise) | All features unlocked |
+| **Manager** | `priya.manager` | `Kuldeep@123` | Spice Route (Enterprise) | Operations + analytics |
+| **Captain** | `aman.captain` | `Kuldeep@123` | Spice Route (Enterprise) | Table & order console |
+| **Customer** | `riya.eats` | `Kuldeep@123` | Diner Discovery | Feed, search, QR scanner & orders |
 
 ---
 

@@ -107,3 +107,13 @@ input:focus, select:focus, textarea:focus {
   outline: 2px solid var(--color-primary) !important;
   outline-offset: 2px !important;
 }
+
+/* Mobile Safe Area notch & gesture padding */
+.safe-bottom {
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+.safe-top {
+  padding-top: env(safe-area-inset-top, 0px);
+}
+

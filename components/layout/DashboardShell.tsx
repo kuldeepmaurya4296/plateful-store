@@ -5,46 +5,45 @@ import { Sidebar } from './Sidebar';
 import { TopBar } from './TopBar';
 import { BottomNav } from './BottomNav';
 import { useAuth } from '@/features/auth/context/AuthContext';
+import { useApp } from '@/lib/AppContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../ui/Button';
 import { X, Sparkles, LogOut } from 'lucide-react';
 import Link from 'next/link';
-
 import { navigationConfig } from '@/lib/navigation';
 
 export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { setCreatePostOpen } = useApp();
 
   if (!user) return <>{children}</>;
 
-  const isSuperAdmin = user.role === 'superadmin';
-  const isDesktopConsole = user.role === 'owner' || user.role === 'manager' || isSuperAdmin;
   const isOwner = user.role === 'owner';
   const menuItems = navigationConfig[user.role] || [];
 
   return (
     <div className="flex min-h-screen bg-bg">
-      {/* Sidebar for Desktop Console (Owner/Manager) */}
-      {isDesktopConsole && <Sidebar />}
+      {/* Sidebar for Desktop Console (All Roles) */}
+      <Sidebar />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 pb-16 lg:pb-0">
         {/* Top Header */}
-        {isDesktopConsole && <TopBar onMenuClick={() => setMobileMenuOpen(true)} />}
+        <TopBar onMenuClick={() => setMobileMenuOpen(true)} />
 
         {/* Dashboard Page Content */}
         <main className="flex-1 p-4 md:p-6 overflow-y-auto max-w-[1600px] w-full mx-auto">
           {children}
         </main>
 
-        {/* Bottom Nav for Mobile Customer/Captain */}
+        {/* Bottom Nav for Mobile */}
         <BottomNav />
       </div>
 
-      {/* Mobile Drawer Menu for Manager Console */}
+      {/* Mobile Drawer Menu */}
       <AnimatePresence>
-        {mobileMenuOpen && isDesktopConsole && (
+        {mobileMenuOpen && (
           <div className="fixed inset-0 z-50 flex lg:hidden">
             {/* Backdrop */}
             <motion.div
@@ -80,6 +79,21 @@ export const DashboardShell: React.FC<{ children: React.ReactNode }> = ({ childr
               <nav className="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto">
                 {menuItems.map((item) => {
                   if (item.ownerOnly && !isOwner) return null;
+
+                  if ('isModal' in item && item.isModal) {
+                    return (
+                      <button
+                        key={item.name}
+                        onClick={() => {
+                          setMobileMenuOpen(false);
+                          setCreatePostOpen(true);
+                        }}
+                        className="w-full text-left px-3 py-2.5 rounded-md text-sm font-semibold text-primary hover:bg-primary-soft/40 cursor-pointer"
+                      >
+                        {item.name}
+                      </button>
+                    );
+                  }
 
                   return (
                     <Link

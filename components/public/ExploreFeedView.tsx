@@ -122,22 +122,6 @@ export const ExploreFeedView: React.FC = () => {
           </div>
         )}
       </div>
-
-      {/* Bottom Nav Simulation link for public guest */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-bg-card border-t border-line lg:hidden flex justify-around items-center h-16 safe-bottom">
-        <Link href="/explore" className="flex flex-col items-center justify-center w-full h-full text-primary">
-          <Utensils className="w-5 h-5" />
-          <span className="text-[10px] mt-1 font-semibold">Feed</span>
-        </Link>
-        <Link href="/customer/scan" className="flex flex-col items-center justify-center w-full h-full text-ink-soft hover:text-ink">
-          <QrCode className="w-5 h-5" />
-          <span className="text-[10px] mt-1 font-medium">Scan QR</span>
-        </Link>
-        <Link href="/customer/search" className="flex flex-col items-center justify-center w-full h-full text-ink-soft hover:text-ink">
-          <Search className="w-5 h-5" />
-          <span className="text-[10px] mt-1 font-medium">Search</span>
-        </Link>
-      </div>
     </div>
   );
 };

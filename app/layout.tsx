@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 import { AppProvider } from "@/lib/AppContext";
@@ -20,6 +20,14 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   title: "Plateful — Premium Restaurant Discovery & Management Console",
   description: "A city-aware food discovery app and unified restaurant management platform.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#C1502E",
 };
 
 export default function RootLayout({
@@ -48,4 +56,3 @@ export default function RootLayout({
     </html>
   );
 }
-

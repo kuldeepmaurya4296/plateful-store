@@ -4,7 +4,8 @@ import React from 'react';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { useApp } from '@/lib/AppContext';
-import { Heart, MessageSquare, MapPin, Star, User } from 'lucide-react';
+import { useToast } from '@/components/ui/Toast';
+import { Heart, MessageSquare, MapPin, Star, User, Share2 } from 'lucide-react';
 import Link from 'next/link';
 
 import { Post } from '@/lib/types';
@@ -15,9 +16,11 @@ interface FeedCardProps {
 
 export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
   const { likePost, setActiveDetailedPostId } = useApp();
+  const { toast } = useToast();
   const [activeMediaIndex, setActiveMediaIndex] = React.useState(0);
   const [isPlaying, setIsPlaying] = React.useState(true);
   const [isMuted, setIsMuted] = React.useState(true);
+  const [hasImageError, setHasImageError] = React.useState(false);
 
   const handleLike = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -107,7 +110,7 @@ export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
         className="bg-bg-alt/20 aspect-video w-full border-y border-line flex flex-col justify-center items-center relative overflow-hidden cursor-pointer group"
       >
         {/* Render media content */}
-        {mediaUrl ? (
+        {mediaUrl && mediaUrl !== 'mock' && !mediaUrl.startsWith('/images/post-') && !hasImageError ? (
           <div className="w-full h-full relative">
             <Badge variant={post.isVeg ? 'success' : 'danger'} size="sm" className="absolute top-4 left-4 shadow-sm z-10">
               {post.isVeg ? 'Veg' : 'Non-Veg'}
@@ -126,6 +129,7 @@ export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
               <img
                 src={mediaUrl}
                 alt="Plating"
+                onError={() => setHasImageError(true)}
                 className={`w-full h-full object-cover ${(post as any).filterClass}`}
               />
             )}
@@ -250,20 +254,38 @@ export const FeedCard: React.FC<FeedCardProps> = ({ post }) => {
       {/* Post Actions & Text details */}
       <div className="px-4 pb-4 space-y-2">
         {/* Interactive icons */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <button
+              onClick={handleLike}
+              className="flex items-center gap-1.5 text-xs text-ink-soft hover:text-danger hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            >
+              <Heart className="w-4 h-4 text-danger fill-danger/10" />
+              <span className="font-semibold">{post.likesCount}</span>
+            </button>
+            <button 
+              onClick={handleOpenDetails}
+              className="flex items-center gap-1.5 text-xs text-ink-soft hover:text-primary transition-all cursor-pointer"
+            >
+              <MessageSquare className="w-4 h-4" />
+              <span className="font-semibold">{post.commentsCount}</span>
+            </button>
+          </div>
+
           <button
-            onClick={handleLike}
-            className="flex items-center gap-1.5 text-xs text-ink-soft hover:text-danger hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigator.clipboard.writeText(`${window.location.origin}/customer`);
+              toast({
+                type: 'success',
+                title: 'Link Copied',
+                description: 'Post link copied to clipboard!'
+              });
+            }}
+            className="p-1 text-ink-soft hover:text-primary transition-colors cursor-pointer"
+            title="Share post"
           >
-            <Heart className="w-4 h-4" />
-            <span className="font-semibold">{post.likesCount}</span>
-          </button>
-          <button 
-            onClick={handleOpenDetails}
-            className="flex items-center gap-1.5 text-xs text-ink-soft hover:text-primary transition-all cursor-pointer"
-          >
-            <MessageSquare className="w-4 h-4" />
-            <span className="font-semibold">{post.commentsCount}</span>
+            <Share2 className="w-4 h-4" />
           </button>
         </div>
 
