@@ -8,13 +8,14 @@ interface AuthContextType {
   user: User | null;
   login: (username: string, role: string, password?: string) => Promise<boolean>;
   logout: () => void;
+  updateSession: (data: Partial<User>) => Promise<void>;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const AuthProviderContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [user, setUser] = useState<User | null>(null);
   const isLoading = status === 'loading';
 
@@ -32,7 +33,6 @@ const AuthProviderContent: React.FC<{ children: React.ReactNode }> = ({ children
         counterId: u.counterId
       });
     } else {
-      // Fallback to local storage for offline / quick demo compatibility if any
       const savedUser = typeof window !== 'undefined' ? localStorage.getItem('plateful_user') : null;
       if (savedUser) {
         try {
@@ -51,7 +51,7 @@ const AuthProviderContent: React.FC<{ children: React.ReactNode }> = ({ children
       const res = await signIn('credentials', {
         redirect: false,
         username: username.trim(),
-        password: password || '123456',
+        password: password || 'Kuldeep@123',
         role
       });
 
@@ -65,6 +65,14 @@ const AuthProviderContent: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const updateSession = async (data: Partial<User>) => {
+    if (user) {
+      const updatedUser = { ...user, ...data };
+      setUser(updatedUser);
+      await update(data);
+    }
+  };
+
   const logout = () => {
     setUser(null);
     if (typeof window !== 'undefined') {
@@ -74,7 +82,7 @@ const AuthProviderContent: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, logout, updateSession, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
