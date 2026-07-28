@@ -16,16 +16,11 @@ export const LoginForm: React.FC = () => {
   const { login } = useAuth();
   const { toast } = useToast();
   const [role, setRole] = useState<'customer' | 'owner' | 'manager' | 'captain' | 'superadmin'>('customer');
-  const [username, setUsername] = useState('riya.eats');
-  const [password, setPassword] = useState('••••••••');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   const handleRoleChange = (newRole: 'customer' | 'owner' | 'manager' | 'captain' | 'superadmin') => {
     setRole(newRole);
-    if (newRole === 'customer') setUsername('riya.eats');
-    else if (newRole === 'owner') setUsername('vikram.owner');
-    else if (newRole === 'manager') setUsername('priya.manager');
-    else if (newRole === 'captain') setUsername('aman.captain');
-    else if (newRole === 'superadmin') setUsername('admin.saas');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -110,6 +105,7 @@ export const LoginForm: React.FC = () => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
+              placeholder="Enter password"
             />
 
             <div className="text-right">
@@ -122,45 +118,6 @@ export const LoginForm: React.FC = () => {
               Access Portal
             </Button>
           </form>
-
-          {/* Quick Select Demo Accounts */}
-          <div className="mt-6 pt-4 border-t border-line/60">
-            <h4 className="text-[11px] font-bold uppercase tracking-wider text-ink-soft mb-2.5">
-              Quick Select Demo Accounts
-            </h4>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              {[
-                { name: 'Riya (Customer)', username: 'riya.eats', role: 'customer' },
-                { name: 'Rahul (Customer)', username: 'rahul.foodie', role: 'customer' },
-                { name: 'Vikram (Owner)', username: 'vikram.owner', role: 'owner' },
-                { name: 'Priya (Manager)', username: 'priya.manager', role: 'manager' },
-                { name: 'Aman (Captain)', username: 'aman.captain', role: 'captain' },
-                { name: 'Rohit (Captain)', username: 'rohit.captain', role: 'captain' },
-                { name: 'Admin (SaaS)', username: 'admin.saas', role: 'superadmin' }
-              ].map(demo => (
-                <button
-                  key={demo.username}
-                  type="button"
-                  onClick={() => {
-                    setRole(demo.role as any);
-                    setUsername(demo.username);
-                    setPassword('123456');
-                  }}
-                  className="text-left px-2.5 py-1.5 rounded border border-line bg-bg hover:bg-primary-soft hover:border-primary/30 transition-all group flex flex-col justify-center cursor-pointer"
-                >
-                  <span className="font-semibold text-ink group-hover:text-primary transition-colors truncate">{demo.name}</span>
-                  <span className="text-[10px] text-ink-soft truncate">@{demo.username}</span>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Helper notes for testing */}
-          <div className="mt-6 pt-4 border-t border-line/60 bg-bg/50 -mx-5 -mb-5 px-5 py-4 rounded-b-lg">
-            <p className="text-[10px] font-mono text-ink-soft leading-relaxed">
-              <span className="font-bold text-primary">Demo Notice:</span> Click any quick select button above or adjust the role tabs to instantly populate credentials.
-            </p>
-          </div>
         </Card>
       </motion.div>
     </div>
