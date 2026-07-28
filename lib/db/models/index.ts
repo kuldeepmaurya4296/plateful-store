@@ -14,3 +14,5 @@ export * from './Message';
 export * from './Counter';
 export * from './Visit';
 export * from './Notification';
+export * from './AuditLog';
+

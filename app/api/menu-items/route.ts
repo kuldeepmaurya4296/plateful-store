@@ -22,6 +22,14 @@ export async function POST(req: Request) {
   try {
     await dbConnect();
     const body = await req.json();
+
+    if (!body.imageUrl || typeof body.imageUrl !== 'string' || !body.imageUrl.trim()) {
+      return NextResponse.json(
+        { error: 'Photo is required for menu items per SRS FR-B.7.2. Each item must have an original restaurant photo.' }, 
+        { status: 400 }
+      );
+    }
+
     if (!body.id) {
       body.id = `m_${Date.now()}`;
     }

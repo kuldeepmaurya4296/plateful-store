@@ -28,6 +28,10 @@ const StorySchema = new Schema<IStoryDocument>(
 );
 
 StorySchema.index({ restaurantId: 1, createdAt: -1 });
+// TTL index: MongoDB automatically deletes documents when expiresAt passes.
+// Non-permanent stories set expiresAt = createdAt + 24h; permanent stories set expiresAt = null.
+// Documents with null expiresAt are never deleted by the TTL thread.
+StorySchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
 export const Story = mongoose.models.Story || mongoose.model<IStoryDocument>('Story', StorySchema);
 export default Story;

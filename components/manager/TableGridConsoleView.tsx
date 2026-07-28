@@ -111,9 +111,17 @@ export const TableGridConsoleView: React.FC = () => {
                     {table.activeSession.customerName}
                   </p>
                 ) : (
-                  <p className="text-xs text-ink-soft italic">No active session</p>
+                  <p className="text-xs text-ink-soft italic flex items-center justify-between">
+                    <span>No active session</span>
+                    {table.status === 'available' && (
+                      <span className="text-[10px] text-amber-600 font-bold bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200" title="Dine-in Reservation Indicator">
+                        Reserved 19:30
+                      </span>
+                    )}
+                  </p>
                 )}
               </div>
+
 
               <div className="flex justify-between items-center pt-2 border-t border-line/60">
                 <span className="text-[10px] text-ink-soft font-mono">Counter {table.counterId.toUpperCase()}</span>

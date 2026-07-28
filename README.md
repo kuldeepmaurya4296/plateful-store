@@ -307,3 +307,63 @@ This project is private and proprietary.
 <div align="center">
   <sub>Built with ❤️ using Next.js, React, and TypeScript</sub>
 </div>
+
+## Master Prompt for opus modal
+
+Perform a complete, production-grade audit of the Plateful monolithic Next.js application at E:\sparsh\plateful, cross-referencing it against every requirements document located at E:\sparsh\ — including 
+
+Plateful_Product_Features_Requirements by Kuldeep.docx
+, 
+
+Project_Explanation.docx
+, 
+
+Software Requirements Specification.docx
+, 
+
+plateful-prd.html
+ (Product Requirements Document), 
+
+plateful-full-srs.html
+ (Full SRS), and 
+
+restaurant_manager_console_mockup_v3.html
+ (Manager Console Mockup) — and produce an exhaustive, role-categorized feature inventory with a gap analysis of everything required to elevate this application to a commercially shippable, production-ready monolithic SaaS product.
+
+Step 1 — Read every reference document in E:\sparsh\: Parse all 6 specification files to extract the complete list of intended features, user flows, personas, database schemas, API endpoints, non-functional requirements, roadmap phases, monetization strategy, and risk items defined by the product owner.
+
+Step 2 — Audit the current codebase at E:\sparsh\plateful\: Scan every Next.js App Router page, API route handler, React component, feature module, context provider, MongoDB model, seed script, middleware, and configuration file. Map each implemented feature to its specification in the reference documents.
+
+Step 3 — Categorize all features by user role (Superadmin, Owner, Manager, Captain, Customer, Public Guest) with implementation status: ✅ Fully Working, ⚠️ Partial/Mock/Frontend-Only, or ❌ Missing/Not Started.
+
+Step 4 — Produce a complete gap analysis listing every missing feature, page, API route, database operation, and UI flow from the PRD/SRS that is not yet implemented. Additionally, identify production-grade requirements not covered by the existing documents, including:
+
+Full CRUD with server-side validation across all entities
+NextAuth session lifecycle with token rotation, refresh, and middleware guards
+Real-time order pipeline (placement → kitchen display → preparation → served → billed → reviewed)
+Time-boxed verified review system (10-minute window post-payment)
+QR code server-side generation and camera-based scanning
+Payment integration (Razorpay/Stripe) with invoice generation
+Cloud media storage (Cloudinary/S3) for menu photos, posts, and stories
+Push notifications and in-app notification center
+Search with MongoDB text indexing, filtering, sorting, and pagination
+Analytics dashboards with real MongoDB aggregation pipelines
+Multi-tenant SaaS subscription enforcement with server-side plan gating
+Direct messaging between customers and restaurants
+Customer loyalty, referral tracking, and visit history
+SEO (meta tags, OG, sitemap, robots.txt), PWA manifest, and offline support
+Error boundaries, loading states, and global error handling
+Rate limiting, CORS, CSP headers, and security hardening
+Accessibility (WCAG AA), internationalization (i18n)
+Testing strategy (unit, integration, E2E) and CI/CD pipeline
+Environment-based config for dev, staging, and production deployments
+Step 5 — Output as a prioritized implementation roadmap organized by feature domain, with priority tiers:
+
+P0 (Critical): Blocking issues, broken flows, security vulnerabilities
+P1 (High): Core business features required before launch
+P2 (Medium): Enhancement features for competitive parity
+P3 (Nice-to-have): Polish, optimization, and delight features
+Do NOT limit the scope — treat this as a full product audit against every requirement document and industry best practice. List every page, API endpoint, database collection, background job, third-party integration, and UI component that a production-grade monolithic SaaS restaurant platform requires.
+
+This prompt references all 6 of your specification documents in E:\sparsh\ and will force a complete cross-reference between what's specified and what's actually built. Want me to execute this analysis now?
+

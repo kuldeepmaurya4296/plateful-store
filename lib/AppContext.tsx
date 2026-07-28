@@ -1,6 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useAuth } from '@/features/auth/context/AuthContext';
+import { useRealtimeSSE } from '@/hooks/useRealtimeSSE';
 import { validateTableTransition } from './tableStateMachine';
 import { 
   Restaurant, 
@@ -75,6 +77,7 @@ interface AppContextType {
   unfollowRestaurant: (userId: string, restaurantId: string) => void;
   updateUserProfile: (userId: string, fields: Partial<User>) => void;
   resetAllData: () => Promise<void>;
+  refreshData: () => Promise<void>;
 
   // Global UI Modal States
   isCreatePostOpen: boolean;
@@ -170,6 +173,33 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       setIsLoading(false);
     }
   };
+
+  const { user } = useAuth();
+  const activeRestaurantId = user?.restaurantId || 'r1';
+
+  // Real-time SSE integration
+  useRealtimeSSE({
+    restaurantId: activeRestaurantId,
+    enabled: !!user,
+    onNewOrder: (newOrderData: any) => {
+      setOrders(prev => {
+        if (prev.some(o => o.id === newOrderData.id)) return prev;
+        return [newOrderData, ...prev];
+      });
+    },
+    onTableUpdate: (tableData: any) => {
+      setTables(prev => prev.map(t => t.id === tableData.id ? { ...t, ...tableData } : t));
+    },
+    onOrderStatus: (orderData: any) => {
+      setOrders(prev => prev.map(o => o.id === orderData.id ? { ...o, ...orderData } : o));
+    },
+    onNotification: (notifData: any) => {
+      setNotifications(prev => [notifData, ...prev]);
+    },
+    onBookingUpdate: (bookingData: any) => {
+      setBookings(prev => prev.map(b => b.id === bookingData.id ? { ...b, ...bookingData } : b));
+    }
+  });
 
   useEffect(() => {
     refreshData();
@@ -529,6 +559,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       unfollowRestaurant,
       updateUserProfile,
       resetAllData,
+      refreshData,
       
       isCreatePostOpen,
       setCreatePostOpen,

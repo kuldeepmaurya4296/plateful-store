@@ -130,7 +130,7 @@ export const CustomerAccountView: React.FC = () => {
       </div>
 
       {/* Grid Stats */}
-      <div className="grid grid-cols-3 gap-3 text-center bg-bg-card border border-line rounded-lg p-3">
+      <div className="grid grid-cols-4 gap-2 text-center bg-bg-card border border-line rounded-lg p-3">
         <div>
           <p className="text-sm font-bold text-ink">{userPosts.length}</p>
           <p className="text-[10px] text-ink-soft font-medium uppercase tracking-wider mt-0.5">Posts</p>
@@ -143,7 +143,40 @@ export const CustomerAccountView: React.FC = () => {
           <p className="text-sm font-bold text-ink">{userBookings.length}</p>
           <p className="text-[10px] text-ink-soft font-medium uppercase tracking-wider mt-0.5">Bookings</p>
         </div>
+        <div>
+          <p className="text-sm font-bold text-primary">150 pts</p>
+          <p className="text-[10px] text-ink-soft font-medium uppercase tracking-wider mt-0.5">Loyalty</p>
+        </div>
       </div>
+
+      {/* Loyalty & Rewards Card */}
+      <Card className="bg-gradient-to-r from-amber-accent/20 to-primary/10 border-primary/20 p-4 space-y-3">
+        <div className="flex justify-between items-center">
+          <div>
+            <span className="text-[10px] uppercase font-bold text-primary tracking-wider">Plateful Rewards · Silver Tier</span>
+            <h3 className="text-base font-serif font-bold text-ink">150 Loyalty Points</h3>
+          </div>
+          <Button variant="primary" size="sm" onClick={() => alert('Redeemed 50 pts for ₹50 dining discount voucher!')}>
+            Redeem 50 pts
+          </Button>
+        </div>
+        <p className="text-xs text-ink-soft leading-relaxed">
+          Earn 10 points on every verified visit review and dining booking!
+        </p>
+      </Card>
+
+      {/* Refer-a-Friend Card */}
+      <Card className="p-4 space-y-2 border-line">
+        <div className="flex justify-between items-center">
+          <div>
+            <h4 className="text-xs font-bold text-ink uppercase tracking-wider">Refer a Friend</h4>
+            <p className="text-xs text-ink-soft mt-0.5">Share code <span className="font-mono font-bold text-primary">PLATEFUL-RIYA50</span> for ₹100 dining credit.</p>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => alert('Referral link copied to clipboard!')}>
+            Copy Code
+          </Button>
+        </div>
+      </Card>
 
       {/* Profile Sections tabs */}
       <div className="flex border-b border-line gap-2">
@@ -253,7 +286,12 @@ export const CustomerAccountView: React.FC = () => {
                     {new Date(bill.createdAt).toLocaleDateString()} · Paid via {bill.paymentMode}
                   </p>
                 </div>
-                <span className="text-xs font-bold text-primary">₹{bill.grandTotal}</span>
+                <div className="flex items-center gap-2">
+                  <span className="text-xs font-bold text-primary">₹{bill.grandTotal}</span>
+                  <Button variant="outline" size="sm" onClick={() => alert('Order items reloaded into cart!')}>
+                    Reorder
+                  </Button>
+                </div>
               </Card>
             ))}
             {userBills.length === 0 && (

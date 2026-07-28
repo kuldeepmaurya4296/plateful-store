@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { dbConnect } from '@/lib/db/connection';
 import { Table } from '@/lib/db/models/Table';
 import { validateTableTransition } from '@/lib/tableStateMachine';
+import { sseManager } from '@/lib/realtime/sseManager';
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -28,6 +29,15 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     }
 
     await table.save();
+
+    if (table.restaurantId) {
+      sseManager.broadcast(table.restaurantId, {
+        type: 'table:status',
+        data: table.toObject ? table.toObject() : table,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     return NextResponse.json(table);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -9,7 +9,8 @@ export interface IOrderDocument extends Document {
   tableNumber?: number;
   items: OrderItem[];
   total: number;
-  status: 'pending' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled';
+  status: 'pending' | 'kitchen' | 'preparing' | 'ready' | 'delivered' | 'completed' | 'cancelled';
+  preparationNote?: string;
   createdAt: Date;
   updatedAt: Date;
   customerName: string;
@@ -24,6 +25,7 @@ const OrderSchema = new Schema<IOrderDocument>(
     type: { type: String, enum: ['online', 'dine-in'], required: true },
     tableId: { type: String },
     tableNumber: { type: Number },
+    preparationNote: { type: String, default: '' },
     items: [{
       menuItemId: String,
       name: String,
@@ -33,9 +35,10 @@ const OrderSchema = new Schema<IOrderDocument>(
     total: { type: Number, required: true },
     status: { 
       type: String, 
-      enum: ['pending', 'preparing', 'ready', 'delivered', 'completed', 'cancelled'], 
+      enum: ['pending', 'kitchen', 'preparing', 'ready', 'delivered', 'completed', 'cancelled'], 
       default: 'pending' 
     },
+
     customerName: { type: String, required: true },
     customerPhone: { type: String, required: true },
     deliveryAddress: { type: String }

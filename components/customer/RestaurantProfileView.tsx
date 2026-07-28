@@ -11,7 +11,8 @@ import { StarRating } from '@/components/ui/StarRating';
 import { useToast } from '@/components/ui/Toast';
 import { Modal } from '@/components/ui/Modal';
 import { Input } from '@/components/ui/Input';
-import { MapPin, MessageSquare, Plus, Check, QrCode, Calendar, Sparkles, Send } from 'lucide-react';
+import { MapPin, MessageSquare, Plus, Check, QrCode, Calendar, Sparkles, Send, Play } from 'lucide-react';
+import { StoryViewerModal } from './StoryViewerModal';
 
 export const RestaurantProfileView: React.FC = () => {
   const params = useParams();
@@ -31,10 +32,12 @@ export const RestaurantProfileView: React.FC = () => {
   } = useApp();
   const { toast } = useToast();
 
-  const [activeTab, setActiveTab] = useState<'menu' | 'reviews' | 'feed'>('menu');
+  const [activeTab, setActiveTab] = useState<'menu' | 'reviews' | 'stories' | 'feed'>('menu');
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [isBookModalOpen, setIsBookModalOpen] = useState(false);
   const [isMessageModalOpen, setIsMessageModalOpen] = useState(false);
+  const [isStoryViewerOpen, setIsStoryViewerOpen] = useState(false);
+  const [selectedStoryIndex, setSelectedStoryIndex] = useState(0);
 
   const [bookDate, setBookDate] = useState('2026-07-12');
   const [bookTime, setBookTime] = useState('7:30 PM');
@@ -215,11 +218,12 @@ export const RestaurantProfileView: React.FC = () => {
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Tabs (FR-A.4.3: Menu, Review, Stories) */}
       <div className="flex border-b border-line gap-2">
         {[
-          { id: 'menu', name: 'Plating Menu' },
+          { id: 'menu', name: 'Menu' },
           { id: 'reviews', name: 'Reviews' },
+          { id: 'stories', name: 'Stories' },
           { id: 'feed', name: 'Community Feed' }
         ].map(tab => (
           <button
@@ -360,7 +364,59 @@ export const RestaurantProfileView: React.FC = () => {
             )}
           </div>
         )}
+
+        {activeTab === 'stories' && (
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              {restaurantStories.map((story, idx) => (
+                <div
+                  key={story.id}
+                  onClick={() => {
+                    setSelectedStoryIndex(idx);
+                    setIsStoryViewerOpen(true);
+                  }}
+                  className="relative aspect-[3/4] rounded-xl overflow-hidden cursor-pointer border border-line group shadow-sm hover:shadow-md transition-all"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={story.mediaUrl}
+                    alt={story.caption || 'Story'}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent flex flex-col justify-end p-2.5">
+                    {story.isPermanent && (
+                      <span className="bg-primary/90 text-white text-[9px] font-bold px-1.5 py-0.5 rounded self-start mb-1 shadow-sm">
+                        Permanent
+                      </span>
+                    )}
+                    <p className="text-[11px] text-white font-medium line-clamp-2 drop-shadow">
+                      {story.caption || 'Tap to view'}
+                    </p>
+                  </div>
+                  <div className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white">
+                    <Play className="w-3 h-3 fill-white ml-0.5" />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {restaurantStories.length === 0 && (
+              <p className="text-xs text-ink-soft text-center py-6 italic">No stories published by this restaurant yet.</p>
+            )}
+          </div>
+        )}
       </div>
+
+      {/* Story Viewer Modal (FR-A.2.3, SRS §A.2) */}
+      <StoryViewerModal
+        isOpen={isStoryViewerOpen}
+        onClose={() => setIsStoryViewerOpen(false)}
+        stories={restaurantStories}
+        restaurantName={restaurant.name}
+        restaurantAvatar={restaurant.name.substring(0, 2).toUpperCase()}
+        initialIndex={selectedStoryIndex}
+        onReply={(storyId, text) => sendMessage(restaurant.id, user?.id || 'u1', 'customer', `[Story Reply]: ${text}`)}
+      />
 
       {/* Booking Modal */}
       <Modal

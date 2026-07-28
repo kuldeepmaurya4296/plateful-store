@@ -3,18 +3,27 @@ import type { NextRequest } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 export async function middleware(req: NextRequest) {
+  const secret = process.env.NEXTAUTH_SECRET;
   const token = await getToken({ 
     req, 
-    secret: process.env.NEXTAUTH_SECRET || 'd3c1a967f62d854ea0134bc57b290dfc' 
+    secret
   });
   const { pathname } = req.nextUrl;
 
-  const isProtectedDashboard = 
+  // Paths requiring user session
+  const isCustomerProtected = 
+    pathname.startsWith('/customer/account') ||
+    pathname.startsWith('/customer/bookings') ||
+    pathname.startsWith('/customer/messages') ||
+    pathname.startsWith('/customer/notifications') ||
+    pathname.startsWith('/customer/settings');
+
+  const isDashboardProtected = 
     pathname.startsWith('/manager') || 
     pathname.startsWith('/captain') || 
     pathname.startsWith('/superadmin');
 
-  if (isProtectedDashboard && !token) {
+  if ((isDashboardProtected || isCustomerProtected) && !token) {
     const loginUrl = new URL('/login', req.url);
     loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);
@@ -41,6 +50,12 @@ export const config = {
   matcher: [
     '/manager/:path*',
     '/captain/:path*',
-    '/superadmin/:path*'
+    '/superadmin/:path*',
+    '/customer/account/:path*',
+    '/customer/bookings/:path*',
+    '/customer/messages/:path*',
+    '/customer/notifications/:path*',
+    '/customer/settings/:path*'
   ]
 };
+

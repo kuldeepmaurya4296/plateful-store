@@ -25,6 +25,7 @@ export const SettlementConsoleView: React.FC = () => {
   const [paymentMode, setPaymentMode] = useState<'Cash' | 'Online'>('Online');
   const [screenshotAttached, setScreenshotAttached] = useState(false);
   const [isSettling, setIsSettling] = useState(false);
+  const [splitCount, setSplitCount] = useState<number>(1);
 
   useEffect(() => {
     if (table && !isAuthorized) {
@@ -107,7 +108,26 @@ export const SettlementConsoleView: React.FC = () => {
 
       {/* Bill summary details */}
       <Card className="space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-ink-soft">Order Summary</h3>
+        <div className="flex justify-between items-center">
+          <h3 className="text-xs font-bold uppercase tracking-wider text-ink-soft">Order Summary</h3>
+          <div className="flex gap-1 text-[10px] font-bold">
+            <button
+              onClick={() => setSplitCount(1)}
+              className={`px-2 py-0.5 rounded cursor-pointer ${splitCount === 1 ? 'bg-primary text-bg' : 'bg-bg-alt text-ink-soft'}`}
+            >
+              Full
+            </button>
+            {[2, 3, 4].map(num => (
+              <button
+                key={num}
+                onClick={() => setSplitCount(num)}
+                className={`px-2 py-0.5 rounded cursor-pointer ${splitCount === num ? 'bg-primary text-bg' : 'bg-bg-alt text-ink-soft'}`}
+              >
+                Split {num}x
+              </button>
+            ))}
+          </div>
+        </div>
         <div className="space-y-2 border-b border-line pb-3">
           {table.activeSession.items.map((item: any, idx: number) => (
             <div key={idx} className="flex justify-between items-center text-xs text-ink">
@@ -129,6 +149,12 @@ export const SettlementConsoleView: React.FC = () => {
             <span>Grand Total</span>
             <span className="text-primary">₹{grandTotal}</span>
           </div>
+          {splitCount > 1 && (
+            <div className="flex justify-between text-xs font-bold text-success bg-success-bg/30 p-2 rounded mt-2 border border-success/20">
+              <span>Per Person ({splitCount}-way split)</span>
+              <span>₹{Math.ceil(grandTotal / splitCount)}</span>
+            </div>
+          )}
         </div>
       </Card>
 
@@ -178,16 +204,29 @@ export const SettlementConsoleView: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div
-                onClick={() => setScreenshotAttached(true)}
-                className="border-1.5 border-dashed border-line rounded-lg p-6 text-center cursor-pointer hover:bg-bg-alt/25 transition-all space-y-2"
-              >
+              <label className="border-1.5 border-dashed border-line rounded-lg p-6 text-center cursor-pointer hover:bg-bg-alt/25 transition-all space-y-2 block relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  onChange={e => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      setScreenshotAttached(true);
+                      toast({
+                        type: 'success',
+                        title: 'Photo Captured',
+                        description: 'Payment proof attached successfully.'
+                      });
+                    }
+                  }}
+                  className="hidden"
+                />
                 <Camera className="w-6 h-6 text-ink-soft mx-auto" />
                 <div>
-                  <span className="text-xs font-bold text-ink block">Upload Payment Success Screen</span>
-                  <span className="text-[10px] text-ink-soft block mt-0.5">Capture client UPI or Card success window</span>
+                  <span className="text-xs font-bold text-ink block">Capture / Upload Payment Success Screen</span>
+                  <span className="text-[10px] text-ink-soft block mt-0.5">Tap to open camera or upload UPI/Card success screenshot</span>
                 </div>
-              </div>
+              </label>
             )}
           </div>
         )}

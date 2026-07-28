@@ -15,11 +15,13 @@ export const QRMenuView: React.FC = () => {
   const params = useParams();
   const router = useRouter();
   const tableId = params?.tableId as string;
-  const { tables, menuItems, restaurants, updateTableStatus } = useApp();
+  const { tables, menuItems, restaurants, updateTableStatus, addOrder } = useApp();
   const { toast } = useToast();
 
   const [isAdmin, setIsAdmin] = useState(false);
   const [showJoinRequest, setShowJoinRequest] = useState(false);
+  const [incomingJoinRequest, setIncomingJoinRequest] = useState<{ requestId: string; participantName: string } | null>(null);
+  const [joinStatus, setJoinStatus] = useState<'idle' | 'pending' | 'accepted' | 'denied'>('idle');
   const [cart, setCart] = useState<{ [itemId: string]: number }>({});
   const [customerName, setCustomerName] = useState('');
   const [customerPhone, setCustomerPhone] = useState('');
@@ -34,6 +36,14 @@ export const QRMenuView: React.FC = () => {
 
     if (!table.activeSession) {
       setIsAdmin(true);
+      setJoinStatus('accepted');
+      // Create session on server
+      fetch(`/api/tables/${table.id}/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'create_session', participantName: 'Table Host' })
+      }).catch(console.error);
+
       toast({
         type: 'info',
         title: 'Table Session Initialized',
@@ -42,40 +52,117 @@ export const QRMenuView: React.FC = () => {
     } else {
       setIsAdmin(false);
       setShowJoinRequest(true);
+      setJoinStatus('pending');
     }
-  }, [table, tableId, toast]);
+  }, [table?.id, table?.qrToken]);
 
-  if (!table || !restaurant) {
-    return (
-      <div className="flex h-screen w-screen items-center justify-center bg-bg p-6">
-        <Card className="text-center max-w-sm">
-          <h3 className="text-lg font-serif font-bold text-ink">Invalid QR Code</h3>
-          <p className="text-xs text-ink-soft mt-1.5">
-            This QR code token does not map to any active table on our servers.
-          </p>
-          <Link href="/explore">
-            <Button variant="primary" className="mt-4">Back to Discovery</Button>
-          </Link>
-        </Card>
-      </div>
-    );
-  }
+  // Connect to SSE stream for real-time join events
+  useEffect(() => {
+    if (!restaurant?.id) return;
+    const eventSource = new EventSource(`/api/realtime/stream?restaurantId=${restaurant.id}`);
+
+    eventSource.addEventListener('table:join_request', (e: MessageEvent) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.tableId === table?.id && isAdmin) {
+          setIncomingJoinRequest({
+            requestId: data.requestId,
+            participantName: data.participantName
+          });
+        }
+      } catch (err) {
+        console.error('Failed to parse join_request event:', err);
+      }
+    });
+
+    eventSource.addEventListener('table:join_response', (e: MessageEvent) => {
+      try {
+        const data = JSON.parse(e.data);
+        if (data.tableId === table?.id && !isAdmin) {
+          if (data.accepted) {
+            setJoinStatus('accepted');
+            setShowJoinRequest(false);
+            toast({
+              type: 'success',
+              title: 'Join Request Approved!',
+              description: `You can now add items to Table ${table?.number || ''}'s order.`
+            });
+          } else {
+            setJoinStatus('denied');
+            setShowJoinRequest(false);
+            toast({
+              type: 'error',
+              title: 'Join Request Denied',
+              description: 'The session admin has denied your join request.'
+            });
+          }
+        }
+      } catch (err) {
+        console.error('Failed to parse join_response event:', err);
+      }
+    });
+
+    return () => {
+      eventSource.close();
+    };
+  }, [restaurant?.id, table?.id, isAdmin, toast]);
+
+  const handleRequestJoin = async () => {
+    if (!table) return;
+    try {
+      const name = customerName.trim() || 'Guest Diner';
+      await fetch(`/api/tables/${table.id}/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'request_join',
+          participantName: name,
+          participantPhone: customerPhone
+        })
+      });
+      toast({
+        type: 'info',
+        title: 'Request Sent',
+        description: 'Waiting for the session admin to accept your request...'
+      });
+    } catch (err) {
+      console.error('Error sending join request:', err);
+    }
+  };
+
+  const handleAdminRespondJoin = async (accepted: boolean) => {
+    if (!table || !incomingJoinRequest) return;
+    try {
+      await fetch(`/api/tables/${table.id}/session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'respond_join',
+          requestId: incomingJoinRequest.requestId,
+          accepted
+        })
+      });
+      setIncomingJoinRequest(null);
+      toast({
+        type: accepted ? 'success' : 'warning',
+        title: accepted ? 'User Accepted' : 'User Denied',
+        description: accepted ? 'Participant can now contribute to this order.' : 'Join request was denied.'
+      });
+    } catch (err) {
+      console.error('Error responding to join:', err);
+    }
+  };
 
   const handleJoinAccept = () => {
-    setShowJoinRequest(false);
-    toast({
-      type: 'success',
-      title: 'Joined Shared Order',
-      description: `You have joined Table ${table.number}'s shared ordering session.`
-    });
+    handleRequestJoin();
   };
 
   const handleJoinDeny = () => {
     setShowJoinRequest(false);
     toast({
       type: 'warning',
-      title: 'Join Request Denied',
-      description: 'You cannot place orders on this table session.'
+      title: 'Join Request Cancelled',
+      description: 'You are browsing in view-only mode.'
     });
     router.push('/explore');
   };
@@ -97,6 +184,7 @@ export const QRMenuView: React.FC = () => {
   };
 
   const handlePlaceOrder = () => {
+    if (!table || !restaurant) return;
     if (!customerPhone.trim()) {
       toast({
         type: 'error',
@@ -118,6 +206,19 @@ export const QRMenuView: React.FC = () => {
 
     const total = orderItems.reduce((acc, curr) => acc + (curr.price * curr.quantity), 0);
 
+    const newOrder = {
+      id: `o_${Date.now()}`,
+      restaurantId: restaurant?.id || '',
+      type: 'dine-in' as const,
+      items: orderItems,
+      total: total,
+      status: 'pending' as const,
+      createdAt: new Date().toISOString(),
+      customerName: customerName || 'Self Order Guest',
+      customerPhone: customerPhone,
+      tableNumber: table?.number || 1
+    };
+
     const activeSession = {
       customerName: customerName || 'Self Order Guest',
       customerPhone: customerPhone,
@@ -128,6 +229,7 @@ export const QRMenuView: React.FC = () => {
       preparationNote: 'Self-placed order'
     };
 
+    addOrder(newOrder);
     updateTableStatus(table.id, 'occupied', activeSession);
     setOrderSent(true);
     setCart({});
@@ -146,8 +248,8 @@ export const QRMenuView: React.FC = () => {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-6 pb-24 space-y-6 min-h-screen relative">
-      {/* Shared Order Join Prompt Overlay */}
-      {showJoinRequest && (
+      {/* Real-time Join Request Modal for Admin */}
+      {isAdmin && incomingJoinRequest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm">
           <motion.div
             initial={{ scale: 0.95, opacity: 0 }}
@@ -158,23 +260,70 @@ export const QRMenuView: React.FC = () => {
               <Users className="w-6 h-6 animate-pulse" />
             </div>
             <div>
-              <h3 className="text-base font-serif font-bold text-ink">Rahul wants to join Table {table.number}</h3>
+              <h3 className="text-base font-serif font-bold text-ink">
+                {incomingJoinRequest.participantName} wants to join Table {table?.number || ''}
+              </h3>
               <p className="text-xs text-ink-soft mt-1 leading-relaxed">
-                Another user scanned the same table QR and wants to contribute to this session.
+                Another guest scanned Table {table?.number || ''}'s QR code and requested permission to contribute to this order.
               </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => handleAdminRespondJoin(false)}
+                className="flex-1 py-2 text-xs font-semibold text-ink-soft border border-line rounded-md hover:bg-bg-alt cursor-pointer"
+              >
+                Deny
+              </button>
+              <button
+                onClick={() => handleAdminRespondJoin(true)}
+                className="flex-1 py-2 text-xs font-semibold bg-primary text-bg rounded-md hover:bg-primary-hover cursor-pointer"
+              >
+                Accept Join
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Shared Order Join Prompt Overlay for non-admin scanners */}
+      {!isAdmin && showJoinRequest && joinStatus !== 'accepted' && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-ink/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-sm bg-bg-card border border-line rounded-lg p-6 shadow-2xl text-center space-y-4"
+          >
+            <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto">
+              <Users className="w-6 h-6 animate-pulse" />
+            </div>
+            <div>
+              <h3 className="text-base font-serif font-bold text-ink">Join Table {table?.number || ''} Order?</h3>
+              <p className="text-xs text-ink-soft mt-1 leading-relaxed">
+                An active ordering session exists for this table. Request permission from the host to add items.
+              </p>
+            </div>
+            <div className="space-y-2 text-left">
+              <input
+                type="text"
+                placeholder="Your Name"
+                value={customerName}
+                onChange={e => setCustomerName(e.target.value)}
+                className="w-full text-xs p-2 border border-line rounded"
+              />
             </div>
             <div className="flex gap-3">
               <button
                 onClick={handleJoinDeny}
                 className="flex-1 py-2 text-xs font-semibold text-ink-soft border border-line rounded-md hover:bg-bg-alt cursor-pointer"
               >
-                Deny
+                Browse Only
               </button>
               <button
                 onClick={handleJoinAccept}
+                disabled={joinStatus === 'pending' && Boolean(customerName)}
                 className="flex-1 py-2 text-xs font-semibold bg-primary text-bg rounded-md hover:bg-primary-hover cursor-pointer"
               >
-                Accept Join
+                Request Join
               </button>
             </div>
           </motion.div>
@@ -190,11 +339,11 @@ export const QRMenuView: React.FC = () => {
         </Link>
         <div>
           <h2 className="text-base font-serif font-bold text-ink leading-tight">
-            {restaurant.name}
+            {restaurant?.name || 'Restaurant'}
           </h2>
           <div className="flex items-center gap-1.5 text-xs text-ink-soft mt-1 font-medium">
             <Shield className="w-3.5 h-3.5 text-primary" />
-            <span>Table {table.number} · {isAdmin ? 'You are Admin' : 'Shared Session'}</span>
+            <span>Table {table?.number || ''} · {isAdmin ? 'You are Admin' : 'Shared Session'}</span>
           </div>
         </div>
       </div>
@@ -299,7 +448,7 @@ export const QRMenuView: React.FC = () => {
             <div>
               <h3 className="text-base font-serif font-bold text-ink">Order In Preparation</h3>
               <p className="text-xs text-ink-soft mt-1 leading-relaxed">
-                Table {table.number}'s order has been synced. The kitchen is preparing your dishes. Enjoy your dining experience!
+                Table {table?.number || ''}'s order has been synced. The kitchen is preparing your dishes. Enjoy your dining experience!
               </p>
             </div>
             <div className="flex gap-2 justify-center pt-2">

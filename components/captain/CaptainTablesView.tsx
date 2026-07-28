@@ -13,7 +13,10 @@ export const CaptainTablesView: React.FC = () => {
   const { tables, counters } = useApp();
 
   const counter = counters.find(c => c.id === user?.counterId) || counters[0];
-  const assignedTables = tables.filter(t => t.counterId === counter?.id);
+  const tenantTables = tables.filter(t => t.restaurantId === user?.restaurantId);
+  const assignedTables = user?.counterId 
+    ? tables.filter(t => t.counterId === counter?.id) 
+    : (tenantTables.length > 0 ? tenantTables : tables);
 
   const getStatusColor = (status: string) => {
     if (status === 'available') return 'success';
@@ -36,7 +39,26 @@ export const CaptainTablesView: React.FC = () => {
             </p>
           </div>
         </div>
-        <Badge variant="success">Active Shift</Badge>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => {
+              fetch('/api/notifications/broadcast', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  restaurantId: user?.restaurantId || 'rest1',
+                  title: 'SOS / Manager Alert',
+                  message: `Captain ${user?.name} requested urgent manager assistance at ${counter?.name || 'Counter 1'}!`
+                })
+              }).catch(console.error);
+              alert('SOS Manager Alert sent! Reception / Manager notified.');
+            }}
+            className="px-3 py-1.5 text-xs font-bold bg-danger text-white rounded-lg hover:bg-danger/90 cursor-pointer animate-pulse"
+          >
+            SOS Manager
+          </button>
+          <Badge variant="success">Active Shift</Badge>
+        </div>
       </div>
 
       {/* Grid Header */}

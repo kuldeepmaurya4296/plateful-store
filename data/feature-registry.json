@@ -1,0 +1,1098 @@
+{
+  "generatedAt": "2026-07-28T20:34:40.453Z",
+  "summary": {
+    "live": 88,
+    "partial": 0,
+    "planned": 0,
+    "total": 88
+  },
+  "features": [
+    {
+      "id": "sa-dashboard",
+      "name": "Platform Analytics Dashboard",
+      "description": "Active tenants, revenue, user metrics with real-time KPIs",
+      "role": "superadmin",
+      "category": "Platform Administration",
+      "status": "live",
+      "evidence": [
+        "page exists",
+        "analytics API exists"
+      ]
+    },
+    {
+      "id": "sa-tenants",
+      "name": "Tenant Registry",
+      "description": "Manage restaurant subscriptions, plans, billing status",
+      "role": "superadmin",
+      "category": "Platform Administration",
+      "status": "live",
+      "evidence": [
+        "page exists",
+        "restaurants API exists"
+      ]
+    },
+    {
+      "id": "sa-owners",
+      "name": "Owner Provisioning",
+      "description": "Create/reset merchant owner credentials",
+      "role": "superadmin",
+      "category": "Platform Administration",
+      "status": "live",
+      "evidence": [
+        "page exists",
+        "users API exists"
+      ]
+    },
+    {
+      "id": "sa-customers",
+      "name": "Customer Directory",
+      "description": "Platform-wide user management with spam flagging",
+      "role": "superadmin",
+      "category": "Platform Administration",
+      "status": "live",
+      "evidence": [
+        "page exists"
+      ]
+    },
+    {
+      "id": "sa-config",
+      "name": "Platform Configuration",
+      "description": "Global feature toggles and settings",
+      "role": "superadmin",
+      "category": "Platform Administration",
+      "status": "live",
+      "evidence": [
+        "page exists"
+      ]
+    },
+    {
+      "id": "sa-audit",
+      "name": "Audit Logging",
+      "description": "Complete audit trail for admin actions",
+      "role": "superadmin",
+      "category": "Platform Administration",
+      "status": "live",
+      "evidence": [
+        "AuditLog model exists",
+        "audit API endpoint exists"
+      ]
+    },
+    {
+      "id": "sa-broadcast",
+      "name": "Platform Notifications Broadcast",
+      "description": "Send platform-wide announcements",
+      "role": "superadmin",
+      "category": "Platform Administration",
+      "status": "live",
+      "evidence": [
+        "broadcast API exists",
+        "platform-wide broadcast logic"
+      ]
+    },
+    {
+      "id": "sa-plans",
+      "name": "Plan Tier Management",
+      "description": "Define and manage SaaS plan tiers with feature gating",
+      "role": "superadmin",
+      "category": "SaaS Subscription Management",
+      "status": "live",
+      "evidence": [
+        "SaaSUpgradeGate component exists",
+        "server-side plan map exists"
+      ]
+    },
+    {
+      "id": "sa-server-plan",
+      "name": "Server-Side Plan Enforcement",
+      "description": "API-level feature gating by subscription plan",
+      "role": "superadmin",
+      "category": "SaaS Subscription Management",
+      "status": "live",
+      "evidence": [
+        "checkSaaSPlanPermission function exists",
+        "feature tier map defined"
+      ]
+    },
+    {
+      "id": "ow-dashboard",
+      "name": "Revenue Dashboard",
+      "description": "Sales, profit, review summary with period toggle",
+      "role": "owner",
+      "category": "Dashboard & Analytics",
+      "srsRef": "B.1",
+      "status": "live",
+      "evidence": [
+        "manager dashboard page exists",
+        "analytics API exists",
+        "MongoDB aggregation pipeline"
+      ]
+    },
+    {
+      "id": "ow-top-dishes",
+      "name": "Top-Selling Dishes Breakdown",
+      "description": "Best-performing menu items by revenue",
+      "role": "owner",
+      "category": "Dashboard & Analytics",
+      "srsRef": "FR-B.1.3",
+      "status": "live",
+      "evidence": [
+        "top dishes aggregation"
+      ]
+    },
+    {
+      "id": "ow-reviews",
+      "name": "Review Summary (Food/Presentation/Ambiance)",
+      "description": "Aggregated rating breakdown with MongoDB aggregation",
+      "role": "owner",
+      "category": "Dashboard & Analytics",
+      "srsRef": "FR-B.1.5",
+      "status": "live",
+      "evidence": [
+        "review aggregation pipeline"
+      ]
+    },
+    {
+      "id": "ow-expense-dash",
+      "name": "Expense Subtotals on Dashboard",
+      "description": "Raw material cost summary on home screen",
+      "role": "owner",
+      "category": "Dashboard & Analytics",
+      "srsRef": "FR-B.1.6",
+      "status": "live",
+      "evidence": [
+        "expense aggregation"
+      ]
+    },
+    {
+      "id": "ow-staff",
+      "name": "User & Captain Management",
+      "description": "Create captain credentials and assign tables",
+      "role": "owner",
+      "category": "Staff & Counter Management",
+      "srsRef": "B.5",
+      "status": "live",
+      "evidence": [
+        "users page exists",
+        "users API exists"
+      ]
+    },
+    {
+      "id": "ow-counters",
+      "name": "Billing Counter Definition",
+      "description": "Define counters with specific table ranges",
+      "role": "owner",
+      "category": "Staff & Counter Management",
+      "srsRef": "FR-B.5.1",
+      "status": "live",
+      "evidence": [
+        "Counter model exists",
+        "counters API exists"
+      ]
+    },
+    {
+      "id": "ow-shifts",
+      "name": "Staff Roster & Shift Scheduling",
+      "description": "Employee management and shift assignment",
+      "role": "owner",
+      "category": "Staff & Counter Management",
+      "status": "live",
+      "evidence": [
+        "staff page exists"
+      ]
+    },
+    {
+      "id": "ow-expenses",
+      "name": "Expense Logging",
+      "description": "Log raw kitchen ingredient costs, supplier payouts, gas refills",
+      "role": "owner",
+      "category": "Inventory & Expenses",
+      "srsRef": "B.6",
+      "status": "live",
+      "evidence": [
+        "expenses page exists",
+        "expenses API exists",
+        "Expense model exists"
+      ]
+    },
+    {
+      "id": "ow-forecast",
+      "name": "Raw Material Forecast",
+      "description": "Predict raw materials needed for the next day",
+      "role": "owner",
+      "category": "Inventory & Expenses",
+      "srsRef": "FR-B.6.2",
+      "status": "live",
+      "evidence": [
+        "forecast API exists",
+        "ForecastItem model exists"
+      ]
+    },
+    {
+      "id": "ow-mark-purchased",
+      "name": "Mark Purchased → Auto-Log Expense",
+      "description": "One-click conversion from forecast to expense entry",
+      "role": "owner",
+      "category": "Inventory & Expenses",
+      "srsRef": "FR-B.6.3",
+      "status": "live",
+      "evidence": [
+        "purchased API endpoint exists",
+        "auto-creates expense"
+      ]
+    },
+    {
+      "id": "mg-table-grid",
+      "name": "Table Grid (¾/¼ split view)",
+      "description": "Visual table layout with real-time status tracking",
+      "role": "manager",
+      "category": "Table & Order Management",
+      "srsRef": "B.2",
+      "status": "live",
+      "evidence": [
+        "tables page exists",
+        "TableGridConsoleView component exists",
+        "component has 371 lines"
+      ]
+    },
+    {
+      "id": "mg-table-fsm",
+      "name": "Table State Machine",
+      "description": "FSM-driven table status transitions with server validation",
+      "role": "manager",
+      "category": "Table & Order Management",
+      "srsRef": "FR-B.2.2",
+      "status": "live",
+      "evidence": [
+        "tableStateMachine.ts exists",
+        "status PATCH API exists",
+        "uses FSM validation"
+      ]
+    },
+    {
+      "id": "mg-add-table-qr",
+      "name": "Add Table + Auto-Generate QR Code",
+      "description": "Increase table count with auto-generated unique QR codes",
+      "role": "manager",
+      "category": "Table & Order Management",
+      "srsRef": "FR-B.2.5",
+      "status": "live",
+      "evidence": [
+        "tables POST API exists",
+        "QR generation in component"
+      ]
+    },
+    {
+      "id": "mg-print-qr",
+      "name": "Print QR Code Flyer",
+      "description": "View and download table QR codes for printing",
+      "role": "manager",
+      "category": "Table & Order Management",
+      "srsRef": "FR-B.2.6",
+      "status": "live",
+      "evidence": [
+        "print QR logic in component",
+        "window.print() call"
+      ]
+    },
+    {
+      "id": "mg-urgent-bill",
+      "name": "Urgent Billing from Grid",
+      "description": "Generate and settle a bill directly from table grid",
+      "role": "manager",
+      "category": "Table & Order Management",
+      "srsRef": "FR-B.2.7",
+      "status": "live",
+      "evidence": [
+        "settlement trigger"
+      ]
+    },
+    {
+      "id": "mg-reservation-indicator",
+      "name": "Reservation Indicator on Grid",
+      "description": "Show upcoming dine-in reservations on table cells",
+      "role": "manager",
+      "category": "Table & Order Management",
+      "srsRef": "FR-B.2.8",
+      "status": "live",
+      "evidence": [
+        "reservation indicator on grid"
+      ]
+    },
+    {
+      "id": "mg-online-orders",
+      "name": "Online Order Feed",
+      "description": "Live feed of incoming delivery/website orders",
+      "role": "manager",
+      "category": "Online Orders Pipeline",
+      "srsRef": "B.3",
+      "status": "live",
+      "evidence": [
+        "orders page exists",
+        "orders API exists"
+      ]
+    },
+    {
+      "id": "mg-order-lifecycle",
+      "name": "Order Status Lifecycle",
+      "description": "Pending Accept → In Kitchen → Ready for Pickup/Dispatch",
+      "role": "manager",
+      "category": "Online Orders Pipeline",
+      "srsRef": "FR-B.3.1",
+      "status": "live",
+      "evidence": [
+        "order status lifecycle enum"
+      ]
+    },
+    {
+      "id": "mg-order-toast",
+      "name": "Global New-Order Toast Notification",
+      "description": "Notification visible across all console screens",
+      "role": "manager",
+      "category": "Online Orders Pipeline",
+      "srsRef": "FR-B.3.2",
+      "status": "live",
+      "evidence": [
+        "order toast notification handler"
+      ]
+    },
+    {
+      "id": "mg-accept-deny",
+      "name": "Accept/Deny Inline Actions",
+      "description": "One-click accept or deny on order notification",
+      "role": "manager",
+      "category": "Online Orders Pipeline",
+      "srsRef": "FR-B.3.3",
+      "status": "live",
+      "evidence": [
+        "accept & deny inline actions"
+      ]
+    },
+    {
+      "id": "mg-kitchen-printer",
+      "name": "Kitchen Printer/Display Integration",
+      "description": "Route accepted orders to kitchen printer/KDS",
+      "role": "manager",
+      "category": "Online Orders Pipeline",
+      "srsRef": "FR-B.3.4",
+      "status": "live",
+      "evidence": [
+        "printer API route exists",
+        "ESC/POS printer routing"
+      ]
+    },
+    {
+      "id": "mg-menu-crud",
+      "name": "CRUD Menu Editor",
+      "description": "Create, read, update, delete menu items with instant price edits",
+      "role": "manager",
+      "category": "Menu Management",
+      "srsRef": "B.7",
+      "status": "live",
+      "evidence": [
+        "menu page exists",
+        "menu-items API exists",
+        "MenuItem model exists",
+        "GET+POST handlers"
+      ]
+    },
+    {
+      "id": "mg-billing-history",
+      "name": "Billing History & Search",
+      "description": "Searchable record of past bills with multi-criteria filter",
+      "role": "manager",
+      "category": "Billing & Finance",
+      "srsRef": "B.4",
+      "status": "live",
+      "evidence": [
+        "billing page exists",
+        "bills API exists"
+      ]
+    },
+    {
+      "id": "mg-bill-reprint",
+      "name": "Bill Reprint, Refund & Payment Breakdown",
+      "description": "Reprint bills, process refunds, view payment mode breakdown",
+      "role": "manager",
+      "category": "Billing & Finance",
+      "srsRef": "FR-B.4.3",
+      "status": "live",
+      "evidence": [
+        "refund logic",
+        "reprint logic"
+      ]
+    },
+    {
+      "id": "mg-bill-download",
+      "name": "Bill Download as PDF/CSV",
+      "description": "Export selected bills as downloadable files",
+      "role": "manager",
+      "category": "Billing & Finance",
+      "srsRef": "FR-B.4.4",
+      "status": "live",
+      "evidence": [
+        "bill download API endpoint exists"
+      ]
+    },
+    {
+      "id": "mg-stories",
+      "name": "Stories/Photos Publishing",
+      "description": "Upload 24-hour stories or standalone restaurant photos",
+      "role": "manager",
+      "category": "Social & Marketing",
+      "srsRef": "FR-B.8.1",
+      "status": "live",
+      "evidence": [
+        "social page exists",
+        "stories API exists"
+      ]
+    },
+    {
+      "id": "mg-discount",
+      "name": "Discount Scheduling",
+      "description": "Time-bound discount ads with start and end time",
+      "role": "manager",
+      "category": "Social & Marketing",
+      "srsRef": "FR-B.8.2",
+      "status": "live",
+      "evidence": [
+        "discount API found"
+      ]
+    },
+    {
+      "id": "mg-special",
+      "name": "Today's Special",
+      "description": "Publish one featured dish visible on customer feed",
+      "role": "manager",
+      "category": "Social & Marketing",
+      "srsRef": "FR-B.8.3",
+      "status": "live",
+      "evidence": [
+        "todays special API found"
+      ]
+    },
+    {
+      "id": "mg-table-map",
+      "name": "Table Map Editor",
+      "description": "Edit floor layout for customer pre-booking view",
+      "role": "manager",
+      "category": "Social & Marketing",
+      "srsRef": "FR-B.8.4",
+      "status": "live",
+      "evidence": [
+        "FloorLayoutEditor component exists"
+      ]
+    },
+    {
+      "id": "mg-customer-dir",
+      "name": "Customer Directory",
+      "description": "VIP tagging, dining frequency and loyalty tracking",
+      "role": "manager",
+      "category": "Customer & Reviews",
+      "status": "live",
+      "evidence": [
+        "customers page exists"
+      ]
+    },
+    {
+      "id": "mg-reviews",
+      "name": "Reviews Portal",
+      "description": "Detailed ratings breakdown with official reply templates",
+      "role": "manager",
+      "category": "Customer & Reviews",
+      "status": "live",
+      "evidence": [
+        "reviews page exists",
+        "reviews API exists"
+      ]
+    },
+    {
+      "id": "mg-logoff",
+      "name": "Account / Shift Logoff",
+      "description": "Clean shift handover for shared device",
+      "role": "manager",
+      "category": "Customer & Reviews",
+      "srsRef": "B.9",
+      "status": "live",
+      "evidence": [
+        "account page exists"
+      ]
+    },
+    {
+      "id": "cp-login",
+      "name": "Owner-Issued Credential Login",
+      "description": "Login with credentials created by owner/manager — no self-registration",
+      "role": "captain",
+      "category": "Authentication",
+      "srsRef": "C.1",
+      "status": "live",
+      "evidence": [
+        "credentials auth provider",
+        "password verification"
+      ]
+    },
+    {
+      "id": "cp-table-grid",
+      "name": "Assigned Table Grid",
+      "description": "Visual grid of only tables assigned to this captain's counter",
+      "role": "captain",
+      "category": "Table & Order Operations",
+      "srsRef": "C.2",
+      "status": "live",
+      "evidence": [
+        "captain page exists"
+      ]
+    },
+    {
+      "id": "cp-take-order",
+      "name": "Take Order (Manual Entry)",
+      "description": "Order entry for customers who prefer not to use their phone",
+      "role": "captain",
+      "category": "Table & Order Operations",
+      "srsRef": "C.3",
+      "status": "live",
+      "evidence": [
+        "CaptainOrderConsoleView component exists",
+        "orders API exists"
+      ]
+    },
+    {
+      "id": "cp-optional-customer",
+      "name": "Optional Customer Name/Mobile",
+      "description": "Neither name nor mobile is required for captain-entered orders",
+      "role": "captain",
+      "category": "Table & Order Operations",
+      "srsRef": "FR-C.3.1",
+      "status": "live",
+      "evidence": [
+        "optional customer fields in UI"
+      ]
+    },
+    {
+      "id": "cp-prep-note",
+      "name": "Preparation Note per Order",
+      "description": "Free-text preparation note field per order",
+      "role": "captain",
+      "category": "Table & Order Operations",
+      "srsRef": "FR-C.3.2",
+      "status": "live",
+      "evidence": [
+        "preparationNote in Order model"
+      ]
+    },
+    {
+      "id": "cp-realtime",
+      "name": "Real-time Sync to Console + Kitchen",
+      "description": "Order updates console table management and kitchen printer instantly",
+      "role": "captain",
+      "category": "Table & Order Operations",
+      "srsRef": "FR-C.3.3",
+      "status": "live",
+      "evidence": [
+        "real-time printer sync endpoint exists"
+      ]
+    },
+    {
+      "id": "cp-post-order",
+      "name": "Post-Order Navigation",
+      "description": "Three choices after sending order: back to grid, add more, or settle",
+      "role": "captain",
+      "category": "Post-Order & Settlement",
+      "srsRef": "C.4",
+      "status": "live",
+      "evidence": [
+        "post-order navigation choices"
+      ]
+    },
+    {
+      "id": "cp-settlement",
+      "name": "Settlement (Cash/Online)",
+      "description": "Choose payment mode and close out the table",
+      "role": "captain",
+      "category": "Post-Order & Settlement",
+      "srsRef": "C.5",
+      "status": "live",
+      "evidence": [
+        "settlement view exists",
+        "bills API exists"
+      ]
+    },
+    {
+      "id": "cp-screenshot",
+      "name": "Payment Screenshot Capture",
+      "description": "Capture photo of payment success screen for online payments",
+      "role": "captain",
+      "category": "Post-Order & Settlement",
+      "srsRef": "FR-C.5.2",
+      "status": "live",
+      "evidence": [
+        "payment screenshot photo field"
+      ]
+    },
+    {
+      "id": "cp-table-revert",
+      "name": "Table Revert to Available on Settlement",
+      "description": "Completing settlement automatically frees the table",
+      "role": "captain",
+      "category": "Post-Order & Settlement",
+      "srsRef": "FR-C.5.4",
+      "status": "live",
+      "evidence": [
+        "revert to available logic"
+      ]
+    },
+    {
+      "id": "cp-bookings",
+      "name": "Bookings Queue",
+      "description": "Incoming reservations and table allocation",
+      "role": "captain",
+      "category": "Other",
+      "status": "live",
+      "evidence": [
+        "bookings page exists"
+      ]
+    },
+    {
+      "id": "cp-account",
+      "name": "Captain Account",
+      "description": "Profile management",
+      "role": "captain",
+      "category": "Other",
+      "status": "live",
+      "evidence": [
+        "account page exists"
+      ]
+    },
+    {
+      "id": "cu-feed",
+      "name": "Instagram-Style Home Feed",
+      "description": "Mixed restaurant + customer posts with city-level filtering",
+      "role": "customer",
+      "category": "Feed & Discovery",
+      "srsRef": "A.1",
+      "status": "live",
+      "evidence": [
+        "customer page exists",
+        "FeedCard component exists",
+        "posts API exists"
+      ]
+    },
+    {
+      "id": "cu-veg-toggle",
+      "name": "Veg/Non-Veg/Both Toggle",
+      "description": "Filter feed content by dietary preference",
+      "role": "customer",
+      "category": "Feed & Discovery",
+      "srsRef": "FR-A.1.2",
+      "status": "live",
+      "evidence": [
+        "veg filter found"
+      ]
+    },
+    {
+      "id": "cu-stories",
+      "name": "Story Tray",
+      "description": "24-hour ephemeral + permanent stories from followed restaurants",
+      "role": "customer",
+      "category": "Feed & Discovery",
+      "srsRef": "A.2",
+      "status": "live",
+      "evidence": [
+        "Story model exists",
+        "stories API exists"
+      ]
+    },
+    {
+      "id": "cu-search",
+      "name": "Search by Name/Cuisine",
+      "description": "Discover restaurants, cuisines and dishes with server-side search",
+      "role": "customer",
+      "category": "Feed & Discovery",
+      "srsRef": "A.4",
+      "status": "live",
+      "evidence": [
+        "search page exists",
+        "search API exists",
+        "server-side regex search"
+      ]
+    },
+    {
+      "id": "cu-qr-scanner",
+      "name": "QR Code Scanner",
+      "description": "Scan table QR to begin ordering session",
+      "role": "customer",
+      "category": "QR Ordering & Shared Tables",
+      "srsRef": "A.3",
+      "status": "live",
+      "evidence": [
+        "scan page exists",
+        "QRScanView component exists"
+      ]
+    },
+    {
+      "id": "cu-qr-api",
+      "name": "QR Menu Resolution API",
+      "description": "Public API resolving QR tokens to table + restaurant + menu",
+      "role": "customer",
+      "category": "QR Ordering & Shared Tables",
+      "status": "live",
+      "evidence": [
+        "QR menu API exists",
+        "resolves token to menu"
+      ]
+    },
+    {
+      "id": "cu-shared-table",
+      "name": "Shared Table Ordering",
+      "description": "Session admin / join request flow for multi-user table ordering",
+      "role": "customer",
+      "category": "QR Ordering & Shared Tables",
+      "srsRef": "FR-A.3.1",
+      "status": "live",
+      "evidence": [
+        "table session API exists",
+        "table session admin logic"
+      ]
+    },
+    {
+      "id": "cu-outlet",
+      "name": "Outlet Page (Menu/Review/Stories tabs)",
+      "description": "Full restaurant profile with tabbed content",
+      "role": "customer",
+      "category": "Restaurant & Outlet Pages",
+      "srsRef": "A.4",
+      "status": "live",
+      "evidence": [
+        "restaurant directory exists"
+      ]
+    },
+    {
+      "id": "cu-wishlist",
+      "name": "Wishlist/Follow Toggle",
+      "description": "Save favourite restaurants for quick access",
+      "role": "customer",
+      "category": "Restaurant & Outlet Pages",
+      "srsRef": "FR-A.4.2",
+      "status": "live",
+      "evidence": [
+        "follow toggle found"
+      ]
+    },
+    {
+      "id": "cu-prebook",
+      "name": "Pre-Book Dine-In (Seat Map)",
+      "description": "Movie-ticket style seat selection with party-size gating",
+      "role": "customer",
+      "category": "Restaurant & Outlet Pages",
+      "srsRef": "A.5",
+      "status": "live",
+      "evidence": [
+        "bookings page exists",
+        "bookings API exists"
+      ]
+    },
+    {
+      "id": "cu-advance-pay",
+      "name": "Advance Booking Payment",
+      "description": "Non-refundable advance fee credited to final bill",
+      "role": "customer",
+      "category": "Restaurant & Outlet Pages",
+      "srsRef": "FR-A.5.5",
+      "status": "live",
+      "evidence": [
+        "payment order API exists"
+      ]
+    },
+    {
+      "id": "cu-like-comment",
+      "name": "Like / Comment / Share on Posts",
+      "description": "Full social interaction on feed posts",
+      "role": "customer",
+      "category": "Social & Engagement",
+      "status": "live",
+      "evidence": [
+        "like button",
+        "comment section",
+        "share button"
+      ]
+    },
+    {
+      "id": "cu-posting",
+      "name": "Customer Social Posting",
+      "description": "Post own food photos to community feed",
+      "role": "customer",
+      "category": "Social & Engagement",
+      "status": "live",
+      "evidence": [
+        "posts API exists",
+        "POST handler"
+      ]
+    },
+    {
+      "id": "cu-reels",
+      "name": "Reels (Short-Form Video)",
+      "description": "Short-form video content from restaurants",
+      "role": "customer",
+      "category": "Social & Engagement",
+      "status": "live",
+      "evidence": [
+        "reels page exists"
+      ]
+    },
+    {
+      "id": "cu-messages",
+      "name": "Direct Messaging",
+      "description": "Real-time customer ↔ restaurant messaging",
+      "role": "customer",
+      "category": "Social & Engagement",
+      "status": "live",
+      "evidence": [
+        "messages page exists",
+        "messages API exists",
+        "Message model exists"
+      ]
+    },
+    {
+      "id": "cu-review",
+      "name": "Review Submission (10-Min Window)",
+      "description": "Server-enforced 10-minute review window post-payment",
+      "role": "customer",
+      "category": "Reviews & Ratings",
+      "srsRef": "A.7",
+      "status": "live",
+      "evidence": [
+        "10-min window enforcement",
+        "deduplication check",
+        "auth guard"
+      ]
+    },
+    {
+      "id": "cu-3ratings",
+      "name": "Three Independent Ratings",
+      "description": "Separate Food, Presentation, and Ambiance ratings",
+      "role": "customer",
+      "category": "Reviews & Ratings",
+      "srsRef": "FR-A.7.2",
+      "status": "live",
+      "evidence": [
+        "3 rating fields in model"
+      ]
+    },
+    {
+      "id": "cu-dedup",
+      "name": "One Review Per Visit (Deduplication)",
+      "description": "Server-side enforcement preventing duplicate reviews",
+      "role": "customer",
+      "category": "Reviews & Ratings",
+      "srsRef": "FR-A.7.3",
+      "status": "live",
+      "evidence": [
+        "dedup enforcement"
+      ]
+    },
+    {
+      "id": "cu-account",
+      "name": "Account Page",
+      "description": "Past orders, visited outlets, posts, and reviews",
+      "role": "customer",
+      "category": "Account & Preferences",
+      "srsRef": "A.6",
+      "status": "live",
+      "evidence": [
+        "account page exists"
+      ]
+    },
+    {
+      "id": "cu-notifications",
+      "name": "Notifications Center",
+      "description": "Order updates, reservation status, announcements",
+      "role": "customer",
+      "category": "Account & Preferences",
+      "status": "live",
+      "evidence": [
+        "notifications page exists",
+        "notifications API exists"
+      ]
+    },
+    {
+      "id": "cu-settings",
+      "name": "Dietary & City Preferences",
+      "description": "Set veg/non-veg default, city, and language",
+      "role": "customer",
+      "category": "Account & Preferences",
+      "status": "live",
+      "evidence": [
+        "settings page exists"
+      ]
+    },
+    {
+      "id": "pl-nextauth",
+      "name": "NextAuth JWT Authentication",
+      "description": "Secure JWT-based session management with bcrypt password hashing",
+      "role": "platform",
+      "category": "Security & Authentication",
+      "status": "live",
+      "evidence": [
+        "credentials provider",
+        "bcrypt hashing",
+        "JWT session strategy"
+      ]
+    },
+    {
+      "id": "pl-google",
+      "name": "Google OAuth Login",
+      "description": "One-click social login with automatic customer account creation",
+      "role": "platform",
+      "category": "Security & Authentication",
+      "status": "live",
+      "evidence": [
+        "Google provider configured",
+        "auto account creation"
+      ]
+    },
+    {
+      "id": "pl-role-auth",
+      "name": "Server-Side Role Authorization",
+      "description": "API-level role checks on all protected endpoints",
+      "role": "platform",
+      "category": "Security & Authentication",
+      "status": "live",
+      "evidence": [
+        "serverAuth module exists",
+        "requireAuthRoles function"
+      ]
+    },
+    {
+      "id": "pl-rate-limit",
+      "name": "Rate Limiting on Auth Endpoints",
+      "description": "Sliding-window IP-based rate limiter for registration/login",
+      "role": "platform",
+      "category": "Security & Authentication",
+      "status": "live",
+      "evidence": [
+        "rateLimit module exists",
+        "applied in register route"
+      ]
+    },
+    {
+      "id": "pl-zod",
+      "name": "Zod Input Validation",
+      "description": "Schema validation on mutation API routes",
+      "role": "platform",
+      "category": "Security & Authentication",
+      "status": "live",
+      "evidence": [
+        "Zod validation in register"
+      ]
+    },
+    {
+      "id": "pl-middleware",
+      "name": "Middleware Route Protection",
+      "description": "All dashboard & sensitive customer routes protected with login redirect",
+      "role": "platform",
+      "category": "Security & Authentication",
+      "status": "live",
+      "evidence": [
+        "JWT token extraction",
+        "customer routes protected",
+        "dashboard routes protected"
+      ]
+    },
+    {
+      "id": "pl-razorpay",
+      "name": "Razorpay Payment Gateway",
+      "description": "Order creation & HMAC-SHA256 signature verification",
+      "role": "platform",
+      "category": "Payments & Billing",
+      "status": "live",
+      "evidence": [
+        "create-order API exists",
+        "verify API exists",
+        "HMAC signature verification"
+      ]
+    },
+    {
+      "id": "pl-saas-tiers",
+      "name": "SaaS Subscription Tiers",
+      "description": "Basic / Premium / Enterprise with feature gating",
+      "role": "platform",
+      "category": "Payments & Billing",
+      "status": "live",
+      "evidence": [
+        "plan enum in Restaurant model",
+        "SaaSUpgradeGate component"
+      ]
+    },
+    {
+      "id": "pl-mongodb",
+      "name": "MongoDB Atlas Database",
+      "description": "16 indexed collections with relationship modeling",
+      "role": "platform",
+      "category": "Technical Infrastructure",
+      "status": "live",
+      "evidence": [
+        "connection module",
+        "18 model files found"
+      ]
+    },
+    {
+      "id": "pl-blob",
+      "name": "Vercel Blob Media Storage",
+      "description": "Cloud-based image upload and serving",
+      "role": "platform",
+      "category": "Technical Infrastructure",
+      "status": "live",
+      "evidence": [
+        "upload API exists",
+        "Vercel Blob put()"
+      ]
+    },
+    {
+      "id": "pl-fsm",
+      "name": "Table Status FSM",
+      "description": "Finite state machine for table lifecycle transitions",
+      "role": "platform",
+      "category": "Technical Infrastructure",
+      "status": "live",
+      "evidence": [
+        "FSM module exists",
+        "transition map defined"
+      ]
+    },
+    {
+      "id": "pl-indexeddb",
+      "name": "IndexedDB Client Persistence",
+      "description": "Client-side data caching for offline-capable UX",
+      "role": "platform",
+      "category": "Technical Infrastructure",
+      "status": "live",
+      "evidence": [
+        "IndexedDB module exists"
+      ]
+    },
+    {
+      "id": "pl-animations",
+      "name": "Framer Motion Animations",
+      "description": "Premium micro-animations and page transitions",
+      "role": "platform",
+      "category": "Technical Infrastructure",
+      "status": "live",
+      "evidence": [
+        "animations.ts exists",
+        "14 components use framer-motion"
+      ]
+    },
+    {
+      "id": "pl-responsive",
+      "name": "Responsive Layout",
+      "description": "Adaptive navigation: desktop sidebar + mobile bottom nav",
+      "role": "platform",
+      "category": "Technical Infrastructure",
+      "status": "live",
+      "evidence": [
+        "Sidebar component",
+        "BottomNav component",
+        "DashboardShell wrapper"
+      ]
+    }
+  ]
+}

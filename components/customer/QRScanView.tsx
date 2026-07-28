@@ -14,6 +14,46 @@ export const QRScanView: React.FC = () => {
   const [selectedTableNum, setSelectedTableNum] = useState('4');
   const [isScanning, setIsScanning] = useState(false);
   const [showFlash, setShowFlash] = useState(false);
+  const [useLiveCamera, setUseLiveCamera] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+  const videoRef = React.useRef<HTMLVideoElement | null>(null);
+
+  const startCamera = async () => {
+    try {
+      setCameraError(null);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' }
+      });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setUseLiveCamera(true);
+      toast({
+        type: 'success',
+        title: 'Camera Stream Active',
+        description: 'Point your camera at a table QR code'
+      });
+    } catch (err: any) {
+      console.error('Camera access error:', err);
+      setCameraError('Camera access denied or unavailable. Using simulator mode.');
+      setUseLiveCamera(false);
+    }
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach(track => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setUseLiveCamera(false);
+  };
+
+  React.useEffect(() => {
+    return () => {
+      stopCamera();
+    };
+  }, []);
 
   const handleSimulateScan = () => {
     setIsScanning(true);
@@ -30,6 +70,7 @@ export const QRScanView: React.FC = () => {
       setTimeout(() => {
         setShowFlash(false);
         setIsScanning(false);
+        stopCamera();
         router.push(`/menu/t${selectedTableNum}`);
       }, 500);
 
@@ -39,13 +80,34 @@ export const QRScanView: React.FC = () => {
   return (
     <div className="max-w-xl mx-auto px-4 py-4 pb-20 space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-xl font-serif font-bold text-ink">Table QR scanner</h1>
-        <p className="text-xs text-ink-soft font-medium mt-0.5">Unlock the visual menu, place group orders, and summon captains.</p>
+      <div className="flex justify-between items-start">
+        <div>
+          <h1 className="text-xl font-serif font-bold text-ink">Table QR scanner</h1>
+          <p className="text-xs text-ink-soft font-medium mt-0.5">Unlock the visual menu, place group orders, and summon captains.</p>
+        </div>
+        <Button
+          variant={useLiveCamera ? 'primary' : 'outline'}
+          size="sm"
+          onClick={useLiveCamera ? stopCamera : startCamera}
+          className="text-xs"
+        >
+          {useLiveCamera ? 'Stop Camera' : 'Use Camera'}
+        </Button>
       </div>
 
       {/* Main Viewport Card */}
       <Card className="relative p-0 overflow-hidden bg-stone-900 border border-line/40 h-[420px] flex flex-col justify-between text-white rounded-2xl">
+        {/* Live Video Element */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity ${
+            useLiveCamera ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          }`}
+        />
+
         <AnimatePresence>
           {showFlash && (
             <motion.div
@@ -58,9 +120,9 @@ export const QRScanView: React.FC = () => {
           )}
         </AnimatePresence>
 
-        {/* Viewport content */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10">
-          <div className="w-52 h-52 relative border-2 border-white/20 rounded-2xl flex items-center justify-center">
+        {/* Viewport overlay content */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center z-10 bg-black/20">
+          <div className="w-52 h-52 relative border-2 border-white/20 rounded-2xl flex items-center justify-center backdrop-blur-[1px]">
             <span className="absolute top-0 left-0 w-6 h-6 border-t-4 border-l-4 border-primary -mt-1 -ml-1 rounded-tl-md" />
             <span className="absolute top-0 right-0 w-6 h-6 border-t-4 border-r-4 border-primary -mt-1 -mr-1 rounded-tr-md" />
             <span className="absolute bottom-0 left-0 w-6 h-6 border-b-4 border-l-4 border-primary -mb-1 -ml-1 rounded-bl-md" />
@@ -70,12 +132,22 @@ export const QRScanView: React.FC = () => {
               isScanning ? 'animate-[bounce_2s_infinite]' : 'top-1/2'
             }`} />
 
-            <QrCode className={`w-16 h-16 ${isScanning ? 'text-white/60 scale-95 animate-pulse' : 'text-white/30'}`} />
+            {!useLiveCamera && (
+              <QrCode className={`w-16 h-16 ${isScanning ? 'text-white/60 scale-95 animate-pulse' : 'text-white/30'}`} />
+            )}
           </div>
 
-          <p className="text-xs font-semibold text-white/90 tracking-wide mt-6 leading-relaxed max-w-xs">
-            {isScanning ? 'Decoding table token...' : 'Align Plateful sticker QR code in frame'}
+          <p className="text-xs font-semibold text-white/90 tracking-wide mt-6 leading-relaxed max-w-xs drop-shadow">
+            {isScanning 
+              ? 'Decoding table token...' 
+              : (useLiveCamera ? 'Point camera at table QR sticker' : 'Align Plateful sticker QR code in frame')}
           </p>
+
+          {cameraError && (
+            <p className="text-[11px] text-amber-400 font-medium mt-2 bg-black/60 px-3 py-1 rounded-full">
+              {cameraError}
+            </p>
+          )}
         </div>
 
         {/* Top bar indicators inside camera view */}

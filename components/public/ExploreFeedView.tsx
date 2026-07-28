@@ -1,25 +1,72 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useApp } from '@/lib/AppContext';
 import { StoryTray } from '@/features/feed/components/StoryTray';
 import { FeedCard } from '@/features/feed/components/FeedCard';
 import { Button } from '@/components/ui/Button';
-import { MapPin, QrCode, Search, Utensils } from 'lucide-react';
+import { MapPin, QrCode, Search, Utensils, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { Post } from '@/lib/types';
 
 export const ExploreFeedView: React.FC = () => {
-  const { posts } = useApp();
+  const { posts: initialContextPosts } = useApp();
   const [city, setCity] = useState('Mumbai');
   const [dietFilter, setDietFilter] = useState<'all' | 'veg' | 'non-veg'>('all');
   const [showCitySelector, setShowCitySelector] = useState(false);
 
-  const filteredPosts = posts.filter(post => {
-    if (post.city.toLowerCase() !== city.toLowerCase()) return false;
-    if (dietFilter === 'veg' && !post.isVeg) return false;
-    if (dietFilter === 'non-veg' && post.isVeg) return false;
-    return true;
-  });
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const observerRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchPosts = useCallback(async (currentCursor: string | null = null, isInitial = false) => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const isVegParam = dietFilter === 'all' ? '' : dietFilter === 'veg' ? 'true' : 'false';
+      const url = `/api/posts?city=${city}&limit=5${isVegParam ? `&isVeg=${isVegParam}` : ''}${currentCursor ? `&cursor=${currentCursor}` : ''}`;
+      const res = await fetch(url);
+      const data = await res.json();
+
+      const fetchedPosts: Post[] = Array.isArray(data) ? data : data.posts || [];
+      const cursorVal = data.nextCursor || null;
+
+      setPosts(prev => isInitial ? fetchedPosts : [...prev, ...fetchedPosts]);
+      setNextCursor(cursorVal);
+      setHasMore(Boolean(cursorVal));
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+      if (isInitial && initialContextPosts.length > 0) {
+        setPosts(initialContextPosts);
+        setHasMore(false);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [city, dietFilter, initialContextPosts, isLoading]);
+
+  useEffect(() => {
+    fetchPosts(null, true);
+  }, [city, dietFilter]);
+
+  // Infinite scroll intersection observer
+  useEffect(() => {
+    if (!observerRef.current || !hasMore || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          fetchPosts(nextCursor);
+        }
+      },
+      { threshold: 0.5 }
+    );
+
+    observer.observe(observerRef.current);
+    return () => observer.disconnect();
+  }, [nextCursor, hasMore, isLoading, fetchPosts]);
 
   return (
     <div className="max-w-xl mx-auto px-4 py-6 pb-20 space-y-6 relative min-h-screen">
@@ -106,11 +153,11 @@ export const ExploreFeedView: React.FC = () => {
 
       {/* Posts Feed list */}
       <div className="space-y-6">
-        {filteredPosts.length > 0 ? (
-          filteredPosts.map(post => (
+        {posts.length > 0 ? (
+          posts.map(post => (
             <FeedCard key={post.id} post={post} />
           ))
-        ) : (
+        ) : !isLoading ? (
           <div className="text-center py-16 bg-bg-card border border-line rounded-lg p-8">
             <div className="bg-bg-alt w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
               <Utensils className="w-5 h-5 text-ink-soft" />
@@ -120,7 +167,17 @@ export const ExploreFeedView: React.FC = () => {
               There are no dishes or reviews posted in {city} with the selected diet filter.
             </p>
           </div>
-        )}
+        ) : null}
+
+        {/* Infinite Scroll Trigger & Spinner */}
+        <div ref={observerRef} className="py-4 text-center">
+          {isLoading && (
+            <div className="flex items-center justify-center gap-2 text-xs text-ink-soft">
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+              <span>Loading more dishes...</span>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
