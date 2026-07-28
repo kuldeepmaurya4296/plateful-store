@@ -1,7 +1,6 @@
 'use client';
 
-import React, { createContext, useContext } from 'react';
-import { usePersistedState } from './hooks/usePersistedState';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { validateTableTransition } from './tableStateMachine';
 import { 
   Restaurant, 
@@ -22,24 +21,6 @@ import {
   TableStatus,
   User
 } from './types';
-
-// Import JSON data for defaults
-import restaurantsData from '@/data/restaurants.json';
-import menuItemsData from '@/data/menu-items.json';
-import tablesData from '@/data/tables.json';
-import ordersData from '@/data/orders.json';
-import billsData from '@/data/bills.json';
-import expensesData from '@/data/expenses.json';
-import forecastData from '@/data/forecast.json';
-import bookingsData from '@/data/bookings.json';
-import reviewsData from '@/data/reviews.json';
-import storiesData from '@/data/stories.json';
-import postsData from '@/data/posts.json';
-import messagesData from '@/data/messages.json';
-import countersData from '@/data/counters.json';
-import visitsData from '@/data/visits.json';
-import notificationsData from '@/data/notifications.json';
-import usersData from '@/data/users.json';
 
 interface AppContextType {
   restaurants: Restaurant[];
@@ -63,7 +44,7 @@ interface AppContextType {
   addOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
   updateTableStatus: (tableId: string, status: TableStatus, activeSession?: any) => boolean;
-  settleTableBill: (tableId: string, paymentMode: string, settledBy: string, slipPhoto?: string) => Bill | null;
+  settleTableBill: (tableId: string, paymentMode: string, settledBy: string, slipPhoto?: string) => Promise<Bill | null>;
   addExpense: (expense: Expense) => void;
   markForecastPurchased: (forecastId: string) => void;
   addBookingRequest: (booking: Booking) => void;
@@ -93,80 +74,132 @@ interface AppContextType {
   followRestaurant: (userId: string, restaurantId: string) => void;
   unfollowRestaurant: (userId: string, restaurantId: string) => void;
   updateUserProfile: (userId: string, fields: Partial<User>) => void;
-  resetAllData: () => void;
+  resetAllData: () => Promise<void>;
 
   // Global UI Modal States
   isCreatePostOpen: boolean;
   setCreatePostOpen: (open: boolean) => void;
   activeDetailedPostId: string | null;
   setActiveDetailedPostId: (postId: string | null) => void;
+  isLoading: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [restaurants, setRestaurants] = usePersistedState<Restaurant[]>('plateful_restaurants', restaurantsData as Restaurant[]);
-  const [menuItems, setMenuItems] = usePersistedState<MenuItem[]>('plateful_menuItems', menuItemsData as MenuItem[]);
-  const [tables, setTables] = usePersistedState<Table[]>('plateful_tables', tablesData as Table[]);
-  const [orders, setOrders] = usePersistedState<Order[]>('plateful_orders', ordersData as Order[]);
-  const [bills, setBills] = usePersistedState<Bill[]>('plateful_bills', billsData as Bill[]);
-  const [expenses, setExpenses] = usePersistedState<Expense[]>('plateful_expenses', expensesData as Expense[]);
-  const [forecast, setForecast] = usePersistedState<ForecastItem[]>('plateful_forecast', forecastData as ForecastItem[]);
-  const [bookings, setBookings] = usePersistedState<Booking[]>('plateful_bookings', bookingsData as Booking[]);
-  const [reviews, setReviews] = usePersistedState<Review[]>('plateful_reviews', reviewsData as Review[]);
-  const [stories, setStories] = usePersistedState<Story[]>('plateful_stories', storiesData as Story[]);
-  const [posts, setPosts] = usePersistedState<Post[]>('plateful_posts', postsData as Post[]);
-  const [messages, setMessages] = usePersistedState<Message[]>('plateful_messages', messagesData as Message[]);
-  const [counters, setCounters] = usePersistedState<Counter[]>('plateful_counters', countersData as Counter[]);
-  const [visits, setVisits] = usePersistedState<Visit[]>('plateful_visits', visitsData as Visit[]);
-  const [notifications, setNotifications] = usePersistedState<Notification[]>('plateful_notifications', notificationsData as Notification[]);
-  const [users, setUsers] = usePersistedState<User[]>('plateful_users', usersData as User[]);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [tables, setTables] = useState<Table[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [bills, setBills] = useState<Bill[]>([]);
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [forecast, setForecast] = useState<ForecastItem[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [stories, setStories] = useState<Story[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [counters, setCounters] = useState<Counter[]>([]);
+  const [visits, setVisits] = useState<Visit[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const [isCreatePostOpen, setCreatePostOpen] = React.useState(false);
-  const [activeDetailedPostId, setActiveDetailedPostId] = React.useState<string | null>(null);
+  const [isCreatePostOpen, setCreatePostOpen] = useState(false);
+  const [activeDetailedPostId, setActiveDetailedPostId] = useState<string | null>(null);
 
-  const resetAllData = () => {
-    localStorage.removeItem('plateful_restaurants');
-    localStorage.removeItem('plateful_menuItems');
-    localStorage.removeItem('plateful_tables');
-    localStorage.removeItem('plateful_orders');
-    localStorage.removeItem('plateful_bills');
-    localStorage.removeItem('plateful_expenses');
-    localStorage.removeItem('plateful_forecast');
-    localStorage.removeItem('plateful_bookings');
-    localStorage.removeItem('plateful_reviews');
-    localStorage.removeItem('plateful_stories');
-    localStorage.removeItem('plateful_posts');
-    localStorage.removeItem('plateful_messages');
-    localStorage.removeItem('plateful_counters');
-    localStorage.removeItem('plateful_visits');
-    localStorage.removeItem('plateful_notifications');
-    localStorage.removeItem('plateful_users');
-    
-    setRestaurants(restaurantsData as Restaurant[]);
-    setMenuItems(menuItemsData as MenuItem[]);
-    setTables(tablesData as Table[]);
-    setOrders(ordersData as Order[]);
-    setBills(billsData as Bill[]);
-    setExpenses(expensesData as Expense[]);
-    setForecast(forecastData as ForecastItem[]);
-    setBookings(bookingsData as Booking[]);
-    setReviews(reviewsData as Review[]);
-    setStories(storiesData as Story[]);
-    setPosts(postsData as Post[]);
-    setMessages(messagesData as Message[]);
-    setCounters(countersData as Counter[]);
-    setVisits(visitsData as Visit[]);
-    setNotifications(notificationsData as Notification[]);
-    setUsers(usersData as User[]);
+  // Fetch initial data from backend API
+  const refreshData = async () => {
+    setIsLoading(true);
+    try {
+      const [
+        resRestaurants,
+        resMenuItems,
+        resTables,
+        resOrders,
+        resBills,
+        resExpenses,
+        resForecast,
+        resBookings,
+        resReviews,
+        resStories,
+        resPosts,
+        resMessages,
+        resCounters,
+        resVisits,
+        resNotifications,
+        resUsers
+      ] = await Promise.all([
+        fetch('/api/restaurants').then(r => r.ok ? r.json() : []),
+        fetch('/api/menu-items').then(r => r.ok ? r.json() : []),
+        fetch('/api/tables').then(r => r.ok ? r.json() : []),
+        fetch('/api/orders').then(r => r.ok ? r.json() : []),
+        fetch('/api/bills').then(r => r.ok ? r.json() : []),
+        fetch('/api/expenses').then(r => r.ok ? r.json() : []),
+        fetch('/api/forecast').then(r => r.ok ? r.json() : []),
+        fetch('/api/bookings').then(r => r.ok ? r.json() : []),
+        fetch('/api/reviews').then(r => r.ok ? r.json() : []),
+        fetch('/api/stories').then(r => r.ok ? r.json() : []),
+        fetch('/api/posts').then(r => r.ok ? r.json() : []),
+        fetch('/api/messages').then(r => r.ok ? r.json() : []),
+        fetch('/api/counters').then(r => r.ok ? r.json() : []),
+        fetch('/api/visits').then(r => r.ok ? r.json() : []),
+        fetch('/api/notifications').then(r => r.ok ? r.json() : []),
+        fetch('/api/users').then(r => r.ok ? r.json() : [])
+      ]);
+
+      setRestaurants(resRestaurants);
+      setMenuItems(resMenuItems);
+      setTables(resTables);
+      setOrders(resOrders);
+      setBills(resBills);
+      setExpenses(resExpenses);
+      setForecast(resForecast);
+      setBookings(resBookings);
+      setReviews(resReviews);
+      setStories(resStories);
+      setPosts(resPosts);
+      setMessages(resMessages);
+      setCounters(resCounters);
+      setVisits(resVisits);
+      setNotifications(resNotifications);
+      setUsers(resUsers);
+    } catch (error) {
+      console.error('Error loading data from MongoDB API backend:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const addOrder = (order: Order) => {
+  useEffect(() => {
+    refreshData();
+  }, []);
+
+  const resetAllData = async () => {
+    try {
+      await fetch('/api/seed', { method: 'POST' });
+      await refreshData();
+    } catch (e) {
+      console.error('Error resetting database:', e);
+    }
+  };
+
+  const addOrder = async (order: Order) => {
     setOrders(prev => [order, ...prev]);
+    await fetch('/api/orders', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(order)
+    });
   };
 
-  const updateOrderStatus = (orderId: string, status: Order['status']) => {
+  const updateOrderStatus = async (orderId: string, status: Order['status']) => {
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+    await fetch(`/api/orders/${orderId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
   };
 
   const updateTableStatus = (tableId: string, status: TableStatus, activeSession?: any): boolean => {
@@ -193,129 +226,120 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         return t;
       });
     });
+
+    if (success) {
+      fetch(`/api/tables/${tableId}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, activeSession })
+      }).catch(err => console.error('Error updating table status:', err));
+    }
+
     return success;
   };
 
-  const settleTableBill = (tableId: string, paymentMode: string, settledBy: string, slipPhoto?: string): Bill | null => {
-    const table = tables.find(t => t.id === tableId);
-    if (!table || !table.activeSession) return null;
-
-    const session = table.activeSession;
-    
-    // Check if table transition from billing to settling/available is allowed
-    const { isValid } = validateTableTransition(table.status, 'available');
-    if (!isValid) {
-      console.warn(`Table ${table.number} cannot be settled directly from ${table.status}`);
-      return null;
+  const settleTableBill = async (tableId: string, paymentMode: string, settledBy: string, slipPhoto?: string): Promise<Bill | null> => {
+    try {
+      const res = await fetch('/api/bills', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tableId, paymentMode, settledBy, slipPhoto })
+      });
+      if (res.ok) {
+        const newBill = await res.json();
+        setBills(prev => [newBill, ...prev]);
+        setTables(prev => prev.map(t => t.id === tableId ? { ...t, status: 'available', activeSession: null } : t));
+        return newBill;
+      }
+    } catch (e) {
+      console.error('Error settling bill:', e);
     }
-
-    const billId = `B-${Math.floor(1000 + Math.random() * 9000)}`;
-    const grandTotal = Math.round(session.total * 1.05);
-
-    const newBill: Bill = {
-      id: billId,
-      tableNumber: table.number,
-      restaurantId: table.restaurantId,
-      customerName: session.customerName || 'Anonymous',
-      customerPhone: session.customerPhone || '',
-      paymentMode,
-      total: session.total,
-      tax: Math.round(session.total * 0.05), // 5% GST
-      discount: 0,
-      grandTotal,
-      startedBy: session.startedBy,
-      settledBy,
-      createdAt: new Date().toISOString(),
-      items: session.items,
-      slipPhoto
-    };
-
-    // Add to bills list
-    setBills(prev => [newBill, ...prev]);
-
-    // Create a visit record to trigger a 10-minute review window for this customer
-    const visitId = `v_dyn_${Date.now()}`;
-    const newVisit: Visit = {
-      id: visitId,
-      userId: "u1", // Default to main customer Riya for demo
-      restaurantId: table.restaurantId,
-      tableId: table.id,
-      paymentConfirmedAt: new Date().toISOString(),
-      reviewWindowOpensAt: new Date().toISOString(),
-      reviewWindowClosesAt: new Date(Date.now() + 10 * 60 * 1000).toISOString(), // 10 minutes
-      isReviewed: false,
-      billId
-    };
-    setVisits(prev => [newVisit, ...prev]);
-
-    // Revert Table Status to Available
-    updateTableStatus(tableId, 'available');
-
-    return newBill;
+    return null;
   };
 
-  const addExpense = (expense: Expense) => {
+  const addExpense = async (expense: Expense) => {
     setExpenses(prev => [expense, ...prev]);
+    await fetch('/api/expenses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(expense)
+    });
   };
 
-  const markForecastPurchased = (forecastId: string) => {
-    const item = forecast.find(f => f.id === forecastId);
-    if (!item) return;
-
-    // Mark as purchased in forecast
+  const markForecastPurchased = async (forecastId: string) => {
     setForecast(prev => prev.map(f => f.id === forecastId ? { ...f, isPurchased: true } : f));
-
-    // Add to logged expenses
-    const newExpense: Expense = {
-      id: `e_dyn_${Date.now()}`,
-      restaurantId: item.restaurantId,
-      itemName: item.itemName,
-      quantity: item.quantityNeeded,
-      cost: item.estimatedCost,
-      category: 'Raw Material',
-      date: new Date().toISOString().split('T')[0],
-      notes: 'Purchased from forecast'
-    };
-    addExpense(newExpense);
+    await fetch(`/api/forecast/${forecastId}/purchase`, { method: 'PATCH' });
+    // Refresh expenses
+    fetch('/api/expenses').then(r => r.json()).then(setExpenses);
   };
 
-  const addBookingRequest = (booking: Booking) => {
+  const addBookingRequest = async (booking: Booking) => {
     setBookings(prev => [booking, ...prev]);
+    await fetch('/api/bookings', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(booking)
+    });
   };
 
-  const updateBookingStatus = (bookingId: string, status: 'confirmed' | 'declined', tableNumber?: number) => {
+  const updateBookingStatus = async (bookingId: string, status: 'confirmed' | 'declined', tableNumber?: number) => {
     setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status, tableNumber } : b));
+    await fetch(`/api/bookings/${bookingId}/status`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status, tableNumber })
+    });
   };
 
-  const addReview = (review: Review) => {
+  const addReview = async (review: Review) => {
     setReviews(prev => [review, ...prev]);
-    // Mark the associated visit as reviewed
-    setVisits(prev => prev.map(v => v.id === review.visitId ? { ...v, isReviewed: true } : v));
+    await fetch('/api/reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(review)
+    });
   };
 
-  const addPost = (post: Post) => {
+  const addPost = async (post: Post) => {
     setPosts(prev => [post, ...prev]);
+    await fetch('/api/posts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(post)
+    });
   };
 
-  const likePost = (postId: string) => {
+  const likePost = async (postId: string) => {
     setPosts(prev => prev.map(p => p.id === postId ? { ...p, likesCount: p.likesCount + 1 } : p));
+    await fetch(`/api/posts/${postId}/like`, { method: 'PATCH' });
   };
 
-  const commentOnPost = (postId: string, commentText: string) => {
+  const commentOnPost = async (postId: string, commentText: string) => {
     setPosts(prev => prev.map(p => p.id === postId ? { ...p, commentsCount: p.commentsCount + 1 } : p));
+    await fetch(`/api/posts/${postId}/comment`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: commentText, userName: 'Riya Kapoor' })
+    });
   };
 
-  const addStory = (story: Story) => {
+  const addStory = async (story: Story) => {
     setStories(prev => [story, ...prev]);
+    await fetch('/api/stories', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(story)
+    });
   };
 
-  const toggleStoryPermanent = (storyId: string) => {
-    setStories(prev => prev.map(s => s.id === storyId ? { ...s, isPermanent: !s.isPermanent, expiresAt: s.isPermanent ? new Date(Date.now() + 24*60*60*1000).toISOString() : null } : s));
+  const toggleStoryPermanent = async (storyId: string) => {
+    setStories(prev => prev.map(s => s.id === storyId ? { ...s, isPermanent: !s.isPermanent } : s));
+    await fetch(`/api/stories/${storyId}`, { method: 'PATCH' });
   };
 
-  const sendMessage = (restaurantId: string, userId: string, sender: 'customer' | 'restaurant', text: string) => {
+  const sendMessage = async (restaurantId: string, userId: string, sender: 'customer' | 'restaurant', text: string) => {
     const newMsg: Message = {
-      id: `msg_dyn_${Date.now()}`,
+      id: `msg_${Date.now()}`,
       restaurantId,
       userId,
       sender,
@@ -323,48 +347,91 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       createdAt: new Date().toISOString()
     };
     setMessages(prev => [...prev, newMsg]);
+    await fetch('/api/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newMsg)
+    });
   };
 
-  const triggerVisitPayment = (tableId: string, customerPhone?: string) => {
-    // Simulate requesting a bill
+  const triggerVisitPayment = (tableId: string) => {
     updateTableStatus(tableId, 'billing');
   };
 
-  const addMenuItem = (item: MenuItem) => {
+  const addMenuItem = async (item: MenuItem) => {
     setMenuItems(prev => [...prev, item]);
+    await fetch('/api/menu-items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(item)
+    });
   };
 
-  const updateMenuItem = (itemId: string, updatedFields: Partial<MenuItem>) => {
+  const updateMenuItem = async (itemId: string, updatedFields: Partial<MenuItem>) => {
     setMenuItems(prev => prev.map(m => m.id === itemId ? { ...m, ...updatedFields } : m));
+    await fetch(`/api/menu-items/${itemId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedFields)
+    });
   };
 
-  const deleteMenuItem = (itemId: string) => {
+  const deleteMenuItem = async (itemId: string) => {
     setMenuItems(prev => prev.filter(m => m.id !== itemId));
+    await fetch(`/api/menu-items/${itemId}`, { method: 'DELETE' });
   };
 
-  const addTable = (table: Table) => {
+  const addTable = async (table: Table) => {
     setTables(prev => [...prev, table]);
+    await fetch('/api/tables', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(table)
+    });
   };
 
-  const updateTenantSubscription = (restaurantId: string, plan: Restaurant['subscriptionPlan']) => {
+  const updateTenantSubscription = async (restaurantId: string, plan: Restaurant['subscriptionPlan']) => {
     setRestaurants(prev => prev.map(r => r.id === restaurantId ? { ...r, subscriptionPlan: plan } : r));
+    await fetch(`/api/restaurants/${restaurantId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscriptionPlan: plan })
+    });
   };
 
-  const toggleTenantStatus = (restaurantId: string) => {
-    setRestaurants(prev => prev.map(r => r.id === restaurantId ? { ...r, subscriptionStatus: r.subscriptionStatus === 'Active' ? 'Suspended' : 'Active' } : r));
+  const toggleTenantStatus = async (restaurantId: string) => {
+    const target = restaurants.find(r => r.id === restaurantId);
+    if (!target) return;
+    const newStatus = target.subscriptionStatus === 'Active' ? 'Suspended' : 'Active';
+    setRestaurants(prev => prev.map(r => r.id === restaurantId ? { ...r, subscriptionStatus: newStatus } : r));
+    await fetch(`/api/restaurants/${restaurantId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ subscriptionStatus: newStatus })
+    });
   };
 
-  const addTenantRestaurant = (restaurant: Restaurant) => {
+  const addTenantRestaurant = async (restaurant: Restaurant) => {
     setRestaurants(prev => [...prev, restaurant]);
+    await fetch('/api/restaurants', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(restaurant)
+    });
   };
 
-  // New Mutators
-  const addNotification = (notification: Notification) => {
+  const addNotification = async (notification: Notification) => {
     setNotifications(prev => [notification, ...prev]);
+    await fetch('/api/notifications', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(notification)
+    });
   };
 
-  const markNotificationRead = (id: string) => {
+  const markNotificationRead = async (id: string) => {
     setNotifications(prev => prev.map(n => n.id === id ? { ...n, isRead: true } : n));
+    await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' });
   };
 
   const markAllNotificationsRead = () => {
@@ -375,8 +442,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setUsers(prev => prev.map(u => u.id === userId ? { ...u, isBanned: !u.isBanned } : u));
   };
 
-  const respondToReview = (reviewId: string, responseText: string) => {
+  const respondToReview = async (reviewId: string, responseText: string) => {
     setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, ownerResponse: responseText } : r));
+    await fetch(`/api/reviews/${reviewId}/respond`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ responseText })
+    });
   };
 
   const followRestaurant = (userId: string, restaurantId: string) => {
@@ -448,7 +520,6 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       toggleTenantStatus,
       addTenantRestaurant,
 
-      // New
       addNotification,
       markNotificationRead,
       markAllNotificationsRead,
@@ -462,7 +533,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       isCreatePostOpen,
       setCreatePostOpen,
       activeDetailedPostId,
-      setActiveDetailedPostId
+      setActiveDetailedPostId,
+      isLoading
     }}>
       {children}
     </AppContext.Provider>

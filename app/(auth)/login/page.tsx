@@ -29,9 +29,9 @@ export default function LoginPage() {
     else if (newRole === 'superadmin') setUsername('admin.saas');
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const success = login(username, role);
+    const success = await login(username, role, password);
 
     if (success) {
       toast({

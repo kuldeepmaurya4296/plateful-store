@@ -224,6 +224,16 @@ cd plateful-store
 npm install
 ```
 
+### Database Setup & Seeding
+
+```bash
+# Copy env configuration
+cp .env.example .env
+
+# Seed MongoDB Atlas Database with initial data
+npm run seed
+```
+
 ### Development
 
 ```bash

@@ -60,10 +60,10 @@ export default function ManagerTablesPage() {
     setShowSettleModal(true);
   };
 
-  const handleSettleComplete = () => {
+  const handleSettleComplete = async () => {
     if (!selectedTable) return;
     
-    const bill = settleTableBill(selectedTable.id, settlingPaymentMode, 'Vikram Mehta');
+    const bill = await settleTableBill(selectedTable.id, settlingPaymentMode, 'Vikram Mehta');
     
     if (bill) {
       toast({

@@ -51,7 +51,7 @@ export default function CaptainSettlementPage() {
     );
   }
 
-  const handleSettle = () => {
+  const handleSettle = async () => {
     if (paymentMode === 'Online' && !screenshotAttached) {
       toast({
         type: 'error',
@@ -64,7 +64,7 @@ export default function CaptainSettlementPage() {
     setIsSettling(true);
 
     // Settle table
-    const settledBill = settleTableBill(
+    const settledBill = await settleTableBill(
       table.id,
       paymentMode,
       user?.name || 'Aman Joshi',

@@ -2,58 +2,89 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User } from '@/lib/types';
-import usersData from '@/data/users.json';
+import { signIn, signOut, useSession, SessionProvider } from 'next-auth/react';
 
 interface AuthContextType {
   user: User | null;
-  login: (username: string, role: string) => boolean;
+  login: (username: string, role: string, password?: string) => Promise<boolean>;
   logout: () => void;
   isLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AuthProviderContent: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { data: session, status } = useSession();
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const isLoading = status === 'loading';
 
   useEffect(() => {
-    // Load user from localStorage on mount
-    const savedUser = localStorage.getItem('plateful_user');
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-      } catch (e) {
-        console.error('Error parsing stored user', e);
+    if (session?.user) {
+      const u = session.user as any;
+      setUser({
+        id: u.id || 'u1',
+        name: u.name || 'User',
+        email: u.email,
+        role: u.role || 'customer',
+        avatar: u.image || u.name?.slice(0, 2).toUpperCase() || 'U',
+        username: u.username || u.name?.toLowerCase().replace(/\s+/g, '') || 'user',
+        restaurantId: u.restaurantId,
+        counterId: u.counterId
+      });
+    } else {
+      // Fallback to local storage for offline / quick demo compatibility if any
+      const savedUser = typeof window !== 'undefined' ? localStorage.getItem('plateful_user') : null;
+      if (savedUser) {
+        try {
+          setUser(JSON.parse(savedUser));
+        } catch {
+          setUser(null);
+        }
+      } else {
+        setUser(null);
       }
     }
-    setIsLoading(false);
-  }, []);
+  }, [session]);
 
-  const login = (username: string, role: string): boolean => {
-    // Find matching mock user
-    const matchedUser = (usersData as User[]).find(
-      u => u.username.toLowerCase() === username.trim().toLowerCase() && u.role === role
-    );
+  const login = async (username: string, role: string, password?: string): Promise<boolean> => {
+    try {
+      const res = await signIn('credentials', {
+        redirect: false,
+        username: username.trim(),
+        password: password || '123456',
+        role
+      });
 
-    if (matchedUser) {
-      setUser(matchedUser);
-      localStorage.setItem('plateful_user', JSON.stringify(matchedUser));
-      return true;
+      if (res?.ok) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      console.error('Login error:', e);
+      return false;
     }
-
-    return false;
   };
 
   const logout = () => {
     setUser(null);
-    localStorage.removeItem('plateful_user');
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('plateful_user');
+    }
+    signOut({ redirect: true, callbackUrl: '/login' });
   };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
+  );
+};
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <SessionProvider>
+      <AuthProviderContent>{children}</AuthProviderContent>
+    </SessionProvider>
   );
 };
 

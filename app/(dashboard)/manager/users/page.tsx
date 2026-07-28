@@ -1,9 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useApp } from '@/lib/AppContext';
 import { useAuth } from '@/features/auth/context/AuthContext';
-import usersData from '@/data/users.json';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
@@ -15,18 +14,20 @@ import { Users, Plus, Shield, ShieldCheck, Trash2, Key } from 'lucide-react';
 export default function ManagerUsersPage() {
   const { toast: fullToast } = useToast();
   const { user } = useAuth();
-  const { counters: mockCounters } = useApp();
+  const { counters: mockCounters, users: allUsers } = useApp();
 
-  const [captains, setCaptains] = useState(() => {
-    const list = (usersData as any[]).filter(u => u.role === 'captain' && u.restaurantId === user?.restaurantId);
-    return list.map(u => ({
+  const [captains, setCaptains] = useState<Array<{ id: string; name: string; username: string; counter: string; status: string }>>([]);
+
+  useEffect(() => {
+    const list = allUsers.filter(u => u.role === 'captain' && (u.restaurantId === user?.restaurantId || !u.restaurantId || u.restaurantId === 'r1'));
+    setCaptains(list.map(u => ({
       id: u.id,
       name: u.name,
       username: u.username,
       counter: u.counterId === 'c1' ? 'Counter 1' : 'Counter 2',
       status: u.id === 'u4' ? 'Active' : 'Off Shift'
-    }));
-  });
+    })));
+  }, [allUsers, user?.restaurantId]);
 
   const tenantCounters = mockCounters.filter(c => c.restaurantId === user?.restaurantId);
 

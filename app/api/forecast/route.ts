@@ -1,0 +1,33 @@
+import { NextResponse } from 'next/server';
+import { dbConnect } from '@/lib/db/connection';
+import { ForecastItem } from '@/lib/db/models/ForecastItem';
+
+export async function GET(req: Request) {
+  try {
+    await dbConnect();
+    const { searchParams } = new URL(req.url);
+    const restaurantId = searchParams.get('restaurantId');
+
+    const filter: any = {};
+    if (restaurantId) filter.restaurantId = restaurantId;
+
+    const forecast = await ForecastItem.find(filter).lean();
+    return NextResponse.json(forecast);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    await dbConnect();
+    const body = await req.json();
+    if (!body.id) {
+      body.id = `f_${Date.now()}`;
+    }
+    const item = await ForecastItem.create(body);
+    return NextResponse.json(item, { status: 201 });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
