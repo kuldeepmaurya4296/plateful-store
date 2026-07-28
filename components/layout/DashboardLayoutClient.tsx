@@ -68,8 +68,8 @@ export const DashboardLayoutClient: React.FC<{ children: React.ReactNode }> = ({
       </AnimatePresence>
 
       <AnimatePresence>
-        <CreatePostModal />
-        <DetailedPostModal />
+        <CreatePostModal key="create-post-modal" />
+        <DetailedPostModal key="detailed-post-modal" />
       </AnimatePresence>
     </DashboardShell>
   );

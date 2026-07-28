@@ -31,8 +31,12 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-bg text-ink font-sans selection:bg-primary-soft selection:text-primary">
+      <body 
+        className="min-h-full flex flex-col bg-bg text-ink font-sans selection:bg-primary-soft selection:text-primary"
+        suppressHydrationWarning
+      >
         <AuthProvider>
           <AppProvider>
             <ToastProvider>
