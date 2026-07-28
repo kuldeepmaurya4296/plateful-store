@@ -73,7 +73,7 @@ async function seedDatabase() {
     await mongoose.connect(MONGODB_URI!);
     console.log('Successfully connected to MongoDB.');
 
-    const defaultPasswordHash = await bcrypt.hash('123456', 10);
+    const defaultPasswordHash = await bcrypt.hash(process.env.DEFAULT_PASSWORD || 'Kuldeep@123', 10);
 
     // 1. Seed Users
     const usersWithHash = usersData.map((u: any) => ({

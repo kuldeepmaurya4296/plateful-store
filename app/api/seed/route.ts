@@ -42,7 +42,7 @@ export async function POST() {
   try {
     await dbConnect();
 
-    const defaultPasswordHash = await bcrypt.hash('123456', 10);
+    const defaultPasswordHash = await bcrypt.hash(process.env.DEFAULT_PASSWORD || 'Kuldeep@123', 10);
 
     const rawUsers = usersData.map((u: any) => ({
       ...u,

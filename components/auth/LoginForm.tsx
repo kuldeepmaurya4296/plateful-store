@@ -96,7 +96,13 @@ export const LoginForm: React.FC = () => {
               value={username}
               onChange={e => setUsername(e.target.value)}
               required
-              placeholder={`Enter ${role} username`}
+              placeholder={
+                role === 'customer' ? 'e.g. riya.eats' :
+                role === 'owner' ? 'e.g. vikram.owner' :
+                role === 'manager' ? 'e.g. priya.manager' :
+                role === 'captain' ? 'e.g. aman.captain' :
+                'e.g. admin.saas'
+              }
             />
 
             <Input
@@ -105,7 +111,7 @@ export const LoginForm: React.FC = () => {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              placeholder="Enter password"
+              placeholder="Default: Kuldeep@123"
             />
 
             <div className="text-right">

@@ -34,8 +34,8 @@ export const authOptions: NextAuthOptions = {
           isValid = await bcrypt.compare(credentials.password, user.passwordHash);
         }
 
-        // Fallback for demo mode if password equals '123456' or 'password'
-        if (!isValid && (credentials.password === '123456' || credentials.password === 'password')) {
+        const expectedDefaultPass = process.env.DEFAULT_PASSWORD || 'Kuldeep@123';
+        if (!isValid && credentials.password === expectedDefaultPass) {
           isValid = true;
         }
 
