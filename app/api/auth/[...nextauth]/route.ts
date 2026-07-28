@@ -1,11 +1,16 @@
 import NextAuth, { NextAuthOptions } from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import GoogleProvider from 'next-auth/providers/google';
 import bcrypt from 'bcryptjs';
 import { dbConnect } from '@/lib/db/connection';
 import { User } from '@/lib/db/models/User';
 
 export const authOptions: NextAuthOptions = {
   providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID || '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET || ''
+    }),
     CredentialsProvider({
       name: 'Credentials',
       credentials: {
@@ -65,11 +70,47 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60 // 30 days
   },
   callbacks: {
+    async signIn({ user, account }) {
+      if (account?.provider === 'google') {
+        try {
+          await dbConnect();
+          const email = user.email?.toLowerCase();
+          if (!email) return false;
+
+          let existingUser = await User.findOne({ email });
+          if (!existingUser) {
+            const baseUsername = email.split('@')[0].replace(/[^a-z0-9]/gi, '');
+            const username = `${baseUsername}_${Math.floor(1000 + Math.random() * 9000)}`;
+
+            existingUser = await User.create({
+              id: `u_g_${Date.now()}`,
+              name: user.name || 'Google User',
+              email: email,
+              username: username,
+              role: 'customer',
+              avatar: user.image || user.name?.slice(0, 2).toUpperCase() || 'GU',
+              createdAt: new Date().toISOString()
+            });
+          }
+
+          (user as any).id = existingUser.id;
+          (user as any).role = existingUser.role;
+          (user as any).username = existingUser.username;
+          (user as any).restaurantId = existingUser.restaurantId;
+          (user as any).counterId = existingUser.counterId;
+          return true;
+        } catch (error) {
+          console.error('Google sign-in database error:', error);
+          return true; // allow sign in fallback
+        }
+      }
+      return true;
+    },
     async jwt({ token, user, trigger, session }) {
       if (user) {
         token.id = user.id;
-        token.role = (user as any).role;
-        token.username = (user as any).username;
+        token.role = (user as any).role || 'customer';
+        token.username = (user as any).username || token.email?.split('@')[0];
         token.restaurantId = (user as any).restaurantId;
         token.counterId = (user as any).counterId;
       }
@@ -81,7 +122,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (token && session.user) {
         (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
+        (session.user as any).role = token.role || 'customer';
         (session.user as any).username = token.username;
         (session.user as any).restaurantId = token.restaurantId;
         (session.user as any).counterId = token.counterId;
