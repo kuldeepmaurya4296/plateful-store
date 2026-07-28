@@ -5,6 +5,7 @@ import { useAuth } from '@/features/auth/context/AuthContext';
 import { usePathname } from 'next/navigation';
 import { Bell, Menu, Sparkles, LogOut } from 'lucide-react';
 import { Button } from '../ui/Button';
+import { UserNavMenu } from './UserNavMenu';
 
 interface TopBarProps {
   onMenuClick?: () => void;
@@ -114,15 +115,9 @@ export const TopBar: React.FC<TopBarProps> = ({ onMenuClick }) => {
           <LogOut className="w-4.5 h-4.5" />
         </button>
 
-        {/* User Details */}
-        <div className="flex items-center gap-2 border-l border-line pl-4">
-          <div className="w-8 h-8 rounded-full bg-primary-soft text-primary font-bold text-xs flex items-center justify-center border border-primary/10">
-            {user.avatar}
-          </div>
-          <div className="hidden md:block text-left">
-            <p className="text-xs font-semibold text-ink leading-tight">{user.name}</p>
-            <p className="text-[10px] font-medium text-ink-soft capitalize">{user.role} view</p>
-          </div>
+        {/* User Nav Profile Dropdown Menu */}
+        <div className="border-l border-line pl-4">
+          <UserNavMenu />
         </div>
       </div>
     </header>
